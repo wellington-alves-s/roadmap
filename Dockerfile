@@ -49,6 +49,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/public ./public
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nestjs:nodejs /app/healthcheck.js ./healthcheck.js
 
 # Definir usuário não-root
 USER nestjs
@@ -62,7 +63,7 @@ ENV PORT=3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
+  CMD node /app/healthcheck.js
 
 # Comando para iniciar a aplicação
-CMD ["dumb-init", "node", "dist/main"]
+CMD ["dumb-init", "node", "dist/src/main.js"]
