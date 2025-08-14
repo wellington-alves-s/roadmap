@@ -5,12 +5,13 @@ import { AppService } from "./app.service";
 export class AppController {
 	constructor(private readonly appService: AppService) {}
 
-	@Get("health")
-	getHealth() {
+	@Get("status")
+	getStatus() {
 		return {
 			status: "ok",
 			timestamp: new Date().toISOString(),
-			service: "roadmap-app"
+			service: "roadmap-app",
+			environment: process.env.NODE_ENV || "development"
 		};
 	}
 }

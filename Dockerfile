@@ -61,9 +61,9 @@ EXPOSE 8080
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node /app/healthcheck.js
+# Health check disabled for now
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#   CMD node /app/healthcheck.js
 
 # Comando para iniciar a aplicação
 CMD ["dumb-init", "node", "dist/src/main.js"]
