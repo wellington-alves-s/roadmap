@@ -55,11 +55,11 @@ COPY --from=builder --chown=nestjs:nodejs /app/healthcheck.js ./healthcheck.js
 USER nestjs
 
 # Expor porta da aplicação
-EXPOSE 3000
+EXPOSE 8080
 
 # Variáveis de ambiente padrão
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
