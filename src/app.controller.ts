@@ -12,4 +12,13 @@ export class AppController {
 			timestamp: new Date().toISOString(),
 		};
 	}
+
+	@Get("api/health")
+	getApiHealth() {
+		return {
+			status: "ok",
+			timestamp: new Date().toISOString(),
+			service: "roadmap-app"
+		};
+	}
 }

@@ -1,5 +1,5 @@
 # easypanel.yml - Configuração para EasyPanel
-# Deploy do Roadmap App
+# Deploy do Roadmap App - Versão simplificada para EasyPanel
 
 name: roadmap-app
 description: "Sistema de Gamificação de Aprendizado - Roadmap App"
@@ -7,10 +7,10 @@ description: "Sistema de Gamificação de Aprendizado - Roadmap App"
 services:
   # Aplicação Principal
   app:
-    image: roadmap-app:latest
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
     ports:
       - "3000:3000"
     environment:
@@ -19,43 +19,11 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=7d
-    volumes:
-      - app-logs:/app/logs
-    depends_on:
-      - database
+      - CORS_ORIGIN=*
     healthcheck:
       test: ["CMD", "node", "healthcheck.js"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     restart: unless-stopped
-
-  # Banco de Dados
-  database:
-    image: mysql:8.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=roadmap_db
-      - MYSQL_USER=roadmap_user
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-volumes:
-  mysql-data:
-    driver: local
-  app-logs:
-    driver: local
-
-networks:
-  default:
-    driver: bridge

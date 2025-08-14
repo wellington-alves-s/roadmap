@@ -1,47 +1,28 @@
 # .dockerignore - Roadmap App
-# Otimiza o build excluindo arquivos desnecessários
+# Ignorar arquivos desnecessários no build do Docker
 
-# Dependencies
+# Dependências
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
-# Build outputs
+# Arquivos de build local
 dist
 build
-*.tgz
+.next
+.nuxt
+.cache
+.temp
+.tmp
 
-# Environment files
+# Arquivos de ambiente
 .env
 .env.local
-.env.development
-.env.test
-.env.production
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Git
-.git
-.gitignore
-
-# Documentation
-docs
-*.md
-README*
-
-# Testing
-coverage
-.nyc_output
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Logs
 logs
@@ -53,30 +34,105 @@ pids
 *.seed
 *.pid.lock
 
-# Optional npm cache directory
+# Coverage directory usado por tools como istanbul
+coverage
+*.lcov
+
+# Diretório de instrumentação do nyc
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Diretórios opcionais de cache do npm
 .npm
 
-# Optional REPL history
-.node_repl_history
+# Diretório de cache do yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
-# Output of 'npm pack'
-*.tgz
+# Arquivo de dependências para zero-installs do yarn
+!.yarn/cache
 
-# Yarn Integrity file
-.yarn-integrity
+# Arquivo de sessão ESLint
+.eslintcache
+
+# Arquivo de cache do Prettier
+.prettiercache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Diretório de saída do FUSE-box
+.fusebox/
+
+# Arquivos locais do DynamoDB
+.dynamodb/
+
+# Porta do TernJS
+.tern-port
+
+# Stores VSCode versions usado para testes
+.vscode-test
+
+# Pasta do yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Git
+.git
+.gitignore
+.gitattributes
 
 # Docker
-Dockerfile
+Dockerfile*
+docker-compose*
 .dockerignore
-docker-compose.yml
 
-# Development only
-.eslintrc.js
-.prettierrc
-tsconfig.json
-tsconfig.build.json
-nest-cli.json
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
 
-# Scripts de desenvolvimento
-scripts/*.js
-!scripts/seed.ts
+# Documentação
+README.md
+docs/
+*.md
+
+# Arquivos de teste
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Editor/IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Prisma
+prisma/migrations/
