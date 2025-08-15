@@ -1,26 +1,7 @@
 #!/bin/bash
-# deploy.sh - Script simplificado para EasyPanel
-# Roadmap App - EasyPanel Deploy
+# deploy.sh - Script mínimo para EasyPanel
+# Este script não faz nada - o EasyPanel gerencia tudo automaticamente
 
-set -e
-
-echo "🚀 Iniciando deploy no EasyPanel..."
-
-# Instalar dependências
-echo "📦 Instalando dependências..."
-npm ci
-
-# Gerar cliente Prisma
-echo "🔧 Gerando cliente Prisma..."
-npx prisma generate
-
-# Build da aplicação
-echo "🏗️ Construindo aplicação..."
-npm run build
-
-# Executar migrações (se necessário)
-echo "📊 Executando migrações..."
-npx prisma migrate deploy || echo "⚠️ Migrações falharam ou não necessárias"
-
-echo "✅ Deploy concluído com sucesso!"
-echo "🚀 Aplicação pronta para iniciar na porta ${PORT:-8080}"
+echo "✅ Deploy script executado com sucesso!"
+echo "🎯 EasyPanel gerenciará o build e deploy automaticamente"
+exit 0
