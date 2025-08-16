@@ -23,21 +23,28 @@ async function bootstrap() {
 		defaultVersion: "1",
 	});
 
-	// Resolver diretório "public" em dev (src) e build (dist)
-	const candidatePublicDirs = [
-		join(__dirname, "..", "public"), // dist/src -> dist/public | src -> public
-		join(process.cwd(), "public"),
-	];
-	const publicDir = candidatePublicDirs.find((dir) => existsSync(join(dir, "index.html"))) || candidatePublicDirs[0];
-
 	// Configurar pasta de arquivos estáticos
-	app.useStaticAssets(publicDir, {
-		index: false, // Desabilita o index automático para podermos controlar
-	});
+	const publicDir = join(process.cwd(), "public");
+	console.log("📁 Diretório public:", publicDir);
+	
+	if (!existsSync(publicDir)) {
+		console.error("❌ Diretório public não encontrado!");
+		console.log("Conteúdo do diretório atual:", process.cwd());
+		process.exit(1);
+	}
 
-	// Middleware para servir o frontend na raiz
+	if (!existsSync(join(publicDir, "index.html"))) {
+		console.error("❌ Arquivo index.html não encontrado!");
+		console.log("Conteúdo do diretório public:");
+		console.log(require("fs").readdirSync(publicDir));
+		process.exit(1);
+	}
+
+	app.useStaticAssets(publicDir);
+	
+	// Middleware para servir o frontend em todas as rotas não-API
 	app.use((req, res, next) => {
-		if (req.path === "/" || req.path === "/index.html") {
+		if (!req.path.startsWith("/api")) {
 			res.sendFile(join(publicDir, "index.html"));
 			return;
 		}

@@ -53,10 +53,15 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modul
 COPY --from=builder --chown=nestjs:nodejs /app/healthcheck.js ./healthcheck.js
 COPY --chown=nestjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
 
-# Verificar se os arquivos foram copiados corretamente
-RUN ls -la /app/public && \
-    ls -la /app/scripts && \
-    ls -la /app/dist
+# Verificar se os arquivos foram copiados corretamente e mostrar conteúdo
+RUN echo "=== Conteúdo do diretório /app ===" && \
+    ls -la /app && \
+    echo "=== Conteúdo do diretório /app/public ===" && \
+    ls -la /app/public && \
+    echo "=== Conteúdo do diretório /app/dist ===" && \
+    ls -la /app/dist && \
+    echo "=== Conteúdo do diretório /app/scripts ===" && \
+    ls -la /app/scripts
 
 # Dar permissão de execução para o entrypoint
 RUN chmod +x ./docker-entrypoint.sh
