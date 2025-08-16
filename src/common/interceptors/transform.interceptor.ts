@@ -1,24 +1,27 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { ApiResponseService } from "../services/api-response.service";
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
+  constructor(private readonly apiResponseService: ApiResponseService) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data: any) => {
-        // Se a resposta for undefined ou null, retorna um objeto vazio
-        if (data === undefined || data === null) {
-          return {};
+        try {
+          // Usa o serviço para transformar a resposta
+          return this.apiResponseService.transform(data);
+        } catch (error) {
+          console.error("Erro ao transformar resposta:", error);
+          // Em caso de erro, retorna um objeto de erro
+          return {
+            success: false,
+            error: "Erro ao processar dados",
+            message: error.message
+          };
         }
-
-        // Se a resposta já for um objeto e não for um array, retorna como está
-        if (typeof data === "object" && !Array.isArray(data)) {
-          return data;
-        }
-        
-        // Caso contrário, envolve em um objeto
-        return { data };
       }),
     );
   }

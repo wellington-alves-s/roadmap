@@ -18,6 +18,7 @@ import { HealthModule } from "./health/health.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
+import { ApiResponseService } from "./common/services/api-response.service";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 
 @Module({
@@ -47,6 +48,7 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 	providers: [
 		AppService,
 		PrismaService,
+		ApiResponseService,
 		{
 			provide: APP_FILTER,
 			useClass: GlobalExceptionFilter,
