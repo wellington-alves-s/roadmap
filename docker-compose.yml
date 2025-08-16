@@ -17,8 +17,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=8080
-      - DATABASE_URL=mysql://roadmap_user:roadmap_password@mysql:3306/roadmap_db
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - DATABASE_URL=mysql://mysql:61ebffc6e00b52add90f@app_database_roadmap:3306/roadmap_db
+      - JWT_SECRET=roadmap_app_jwt_secret_key_2025_production_must_be_very_secure_and_long_enough_for_security
       - JWT_EXPIRES_IN=7d
     depends_on:
       mysql:
@@ -40,10 +40,10 @@ services:
     container_name: roadmap-mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password_change_me}
+      - MYSQL_ROOT_PASSWORD=fdac5598738543f51757
       - MYSQL_DATABASE=roadmap_db
-      - MYSQL_USER=roadmap_user
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-roadmap_password_change_me}
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=61ebffc6e00b52add90f
       - MYSQL_CHARSET=utf8mb4
       - MYSQL_COLLATION=utf8mb4_unicode_ci
     ports:
@@ -54,7 +54,7 @@ services:
     networks:
       - roadmap-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_password_change_me}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pfdac5598738543f51757"]
       interval: 10s
       timeout: 5s
       retries: 5

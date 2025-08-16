@@ -1,0 +1,28 @@
+# EasyPanel Configuration - Roadmap App
+name: roadmap
+services:
+  app:
+    image:
+      dockerfile: ./Dockerfile
+    domains:
+      - host: roadmap.localhost
+    env:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_HOST: app_database_roadmap
+      DATABASE_PORT: 3306
+      DATABASE_USER: mysql
+      DATABASE_PASS: 61ebffc6e00b52add90f
+      DATABASE_NAME: roadmap_db
+      DATABASE_ROOT_PASSWORD: fdac5598738543f51757
+      DATABASE_URL: mysql://mysql:61ebffc6e00b52add90f@app_database_roadmap:3306/roadmap_db
+      JWT_SECRET: "roadmap_app_jwt_secret_key_2025_production_must_be_very_secure_and_long_enough_for_security"
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGIN: "*"
+    deploy:
+      replicas: 1
+    resources:
+      memory: 512MB
+    healthcheck:
+      path: /api/v1/health
+      port: 8080

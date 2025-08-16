@@ -29,7 +29,7 @@ RUN npm run build
 FROM node:18-alpine AS production
 
 # Instalar dependências do sistema necessárias
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init netcat-openbsd
 
 # Criar usuário não-root
 RUN addgroup --system --gid 1001 nodejs
@@ -50,6 +50,10 @@ COPY --from=builder --chown=nestjs:nodejs /app/public ./public
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nestjs:nodejs /app/healthcheck.js ./healthcheck.js
+COPY --chown=nestjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+
+# Dar permissão de execução para o entrypoint
+RUN chmod +x ./docker-entrypoint.sh
 
 # Definir usuário não-root
 USER nestjs
@@ -66,4 +70,4 @@ ENV PORT=8080
 #   CMD node /app/healthcheck.js
 
 # Comando para iniciar a aplicação
-CMD ["dumb-init", "node", "dist/src/main.js"]
+CMD ["dumb-init", "./docker-entrypoint.sh"]
