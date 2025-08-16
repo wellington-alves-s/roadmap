@@ -7,7 +7,7 @@ services:
     domains:
       - host: roadmap.localhost
     proxy:
-      port: 8080
+      port: 3003
       secure: false
       rewrite: false
       websocket: true

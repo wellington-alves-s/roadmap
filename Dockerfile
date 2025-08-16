@@ -70,11 +70,11 @@ RUN chmod +x ./docker-entrypoint.sh
 USER nestjs
 
 # Expor porta da aplicação
-EXPOSE 8080
+EXPOSE 3003
 
 # Variáveis de ambiente padrão
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=3003
 
 # Health check disabled for now
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
