@@ -19,6 +19,9 @@ RUN npm ci && npm install -g tsconfig-paths && npm cache clean --force
 # Copiar código fonte
 COPY . .
 
+# Criar diretório para interceptors
+RUN mkdir -p src/common/interceptors
+
 # Gerar cliente Prisma
 RUN npx prisma generate
 
