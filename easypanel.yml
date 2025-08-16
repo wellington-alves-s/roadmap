@@ -6,6 +6,10 @@ services:
       dockerfile: ./Dockerfile
     domains:
       - host: roadmap.localhost
+    proxy:
+      port: 8080
+      secure: false
+      rewrite: true
     env:
       NODE_ENV: production
       PORT: 8080
@@ -24,5 +28,8 @@ services:
     resources:
       memory: 512MB
     healthcheck:
-      path: /api/v1/health
+      path: /api/health
       port: 8080
+      interval: 30s
+      timeout: 10s
+      retries: 3

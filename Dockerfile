@@ -42,7 +42,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar apenas dependências de produção
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production && npm install -g ts-node typescript && npm cache clean --force
 
 # Copiar build da aplicação do stage anterior
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
