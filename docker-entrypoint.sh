@@ -29,6 +29,17 @@ npx prisma migrate deploy
 echo "🌱 Executando seed..."
 npm run seed || echo "Seed já executado ou falhou (normal se já existe dados)"
 
+# Verificar diretório public
+echo "📁 Verificando diretório public..."
+if [ ! -d "/app/public" ] && [ ! -d "/app/dist/public" ]; then
+  echo "❌ Diretório public não encontrado!"
+  echo "Conteúdo de /app:"
+  ls -la /app
+  echo "Conteúdo de /app/dist (se existir):"
+  ls -la /app/dist || true
+  exit 1
+fi
+
 # Iniciar aplicação
 echo "🎯 Iniciando aplicação na porta ${PORT:-8080}..."
 exec node dist/src/main.js
