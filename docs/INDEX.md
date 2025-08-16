@@ -12,18 +12,10 @@
   - Changelog e roadmap futuro
 
 ### **🚀 Deploy e Produção**
-- [`DEPLOY_QUICKSTART.md`](../DEPLOY_QUICKSTART.md) - **Deploy rápido** (5 minutos)
-  - Configuração express para produção
-  - Scripts automáticos Linux/Windows
-  - Deploy via EasyPanel interface
-- [`EASYPANEL_DEPLOY_GUIDE.md`](./EASYPANEL_DEPLOY_GUIDE.md) - **Guia completo EasyPanel**
-  - Documentação detalhada de deploy
-  - Configurações de segurança
-  - Troubleshooting e otimizações
-- [`DEPLOY.md`](../DEPLOY.md) - **Deploy avançado**
-  - Configurações manuais
-  - Docker Compose completo
-  - Gestão e manutenção
+- [`SETUP.md`](./SETUP.md) - **Guia de instalação e deploy**
+  - Configuração do ambiente
+  - Deploy com Docker Compose
+  - Instruções de produção
 
 ## 🎯 Funcionalidades Específicas
 

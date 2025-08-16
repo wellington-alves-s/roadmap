@@ -3028,7 +3028,7 @@ async function loadUserData() {
 		// Verificar se é erro de conexão
 		if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
 			showError(
-				"Erro de conexão: Verifique se o servidor está rodando em http://localhost:3000",
+				"Erro de conexão: Verifique se o servidor está rodando em http://localhost:8080",
 			);
 		} else if (error.message.includes("401") || error.message.includes("Unauthorized")) {
 			showError("Erro de autenticação: Faça login novamente");
@@ -4009,7 +4009,7 @@ window.forceCheckAchievements = async function() {
 	try {
 		console.log("🚀 Forçando verificação de conquistas...");
 		
-		const response = await fetch(`http://localhost:3000/api/v1/achievements/check/${currentUser.id}`, {
+		const response = await fetch(`http://localhost:8080/api/v1/achievements/check/${currentUser.id}`, {
 			method: "POST",
 			headers: {
 				"Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -4046,7 +4046,7 @@ window.checkAchievementsInDB = async function() {
 	try {
 		console.log("🔍 Verificando conquistas no banco de dados...");
 		
-		const response = await fetch(`http://localhost:3000/api/v1/achievements`, {
+		const response = await fetch(`http://localhost:8080/api/v1/achievements`, {
 			headers: {
 				"Authorization": `Bearer ${localStorage.getItem("token")}`
 			}
@@ -4078,7 +4078,7 @@ window.resetAndSeed = async function() {
 	try {
 		console.log("🔄 Forçando reset e seed do banco...");
 		
-		const response = await fetch(`http://localhost:3000/api/seed/reset`, {
+		const response = await fetch(`http://localhost:8080/api/seed/reset`, {
 			method: "POST",
 			headers: {
 				"Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -4792,7 +4792,7 @@ window.resetAchievements = async function() {
 	try {
 		console.log("🗑️ Resetando todas as conquistas...");
 		
-		const response = await fetch('http://localhost:3000/api/v1/progress/reset/1', {
+		const response = await fetch('http://localhost:8080/api/v1/progress/reset/1', {
 			method: 'DELETE',
 			headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 		});
@@ -4816,7 +4816,7 @@ window.cleanDuplicateAchievements = async function() {
 		console.log("🧹 Limpando conquistas duplicadas...");
 		
 		// 1. Buscar todas as conquistas do usuário
-		const response = await fetch('http://localhost:3000/api/v1/achievements/user/1', {
+		const response = await fetch('http://localhost:8080/api/v1/achievements/user/1', {
 			headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 		});
 		const userAchievements = await response.json();
@@ -4838,7 +4838,7 @@ window.cleanDuplicateAchievements = async function() {
 		// 3. Remover duplicatas
 		for (const duplicateId of duplicates) {
 			try {
-				const deleteResponse = await fetch(`http://localhost:3000/api/v1/achievements/user/1/achievement/${duplicateId}`, {
+				const deleteResponse = await fetch(`http://localhost:8080/api/v1/achievements/user/1/achievement/${duplicateId}`, {
 					method: 'DELETE',
 					headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 				});
@@ -4953,14 +4953,14 @@ window.checkUserData = async function() {
 		console.log("🔍 Verificando dados completos do usuário...");
 		
 		// 1. Verificar progresso
-		const progressResponse = await fetch('http://localhost:3000/api/v1/progress/user/1', {
+		const progressResponse = await fetch('http://localhost:8080/api/v1/progress/user/1', {
 			headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 		});
 		const progress = await progressResponse.json();
 		console.log("📊 Progresso do usuário:", progress);
 		
 		// 2. Verificar conquistas do usuário
-		const userAchievementsResponse = await fetch('http://localhost:3000/api/v1/achievements/user/1', {
+		const userAchievementsResponse = await fetch('http://localhost:8080/api/v1/achievements/user/1', {
 			headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 		});
 		const userAchievements = await userAchievementsResponse.json();
@@ -5036,7 +5036,7 @@ window.createAchievements = async function() {
 	
 	for (const achievement of achievements) {
 		try {
-			const response = await fetch('http://localhost:3000/api/v1/achievements', {
+			const response = await fetch('http://localhost:8080/api/v1/achievements', {
 				method: 'POST',
 				headers: {
 					'Authorization': `Bearer ${localStorage.getItem('token')}`,

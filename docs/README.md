@@ -223,21 +223,15 @@ npm run start:dev
 
 ### **2. Deploy em Produção**
 
-#### **🐳 Deploy com Docker/EasyPanel (Recomendado)**
+#### **🐳 Deploy com Docker (Recomendado)**
 ```bash
 # Configurar ambiente
 cp env.production.example .env
 nano .env  # Editar configurações
 
-# Deploy automático
-./deploy.sh  # Linux/Mac
-.\deploy.ps1  # Windows
+# Deploy com Docker Compose
+docker-compose up -d
 ```
-
-#### **📚 Documentação de Deploy**
-- **Deploy Rápido**: [`DEPLOY_QUICKSTART.md`](../DEPLOY_QUICKSTART.md)
-- **Deploy Completo**: [`docs/EASYPANEL_DEPLOY_GUIDE.md`](./EASYPANEL_DEPLOY_GUIDE.md)
-- **Configuração Avançada**: [`DEPLOY.md`](../DEPLOY.md)
 
 ### **3. Usuário de Teste**
 - **Email**: `dev@roadmap.com`
