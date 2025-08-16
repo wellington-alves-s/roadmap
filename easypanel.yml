@@ -13,6 +13,8 @@ services:
       websocket: true
       headers:
         Host: roadmap.localhost
+    ports:
+      - 3003:3003  # Expor porta diretamente
     env:
       NODE_ENV: production
       PORT: 8080

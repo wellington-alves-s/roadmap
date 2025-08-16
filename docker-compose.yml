@@ -13,7 +13,7 @@ services:
     container_name: roadmap-app
     restart: unless-stopped
     ports:
-      - "3003:3003"
+      - "127.0.0.1:3003:3003"  # Bind apenas ao localhost
     environment:
       - NODE_ENV=production
       - PORT=3003

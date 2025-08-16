@@ -11,7 +11,14 @@ async function bootstrap() {
 
 	// Configurar CORS
 	app.enableCors({
-		origin: ["http://localhost:8080", "http://127.0.0.1:8080", "http://localhost:3000", "http://127.0.0.1:3000", "file://", "http://roadmap.localhost"],
+		origin: [
+			"http://localhost:3003",
+			"http://127.0.0.1:3003",
+			"http://roadmap.localhost",
+			"http://localhost",
+			"http://127.0.0.1",
+			"file://"
+		],
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
