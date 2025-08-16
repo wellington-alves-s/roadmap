@@ -10,6 +10,9 @@ services:
       port: 8080
       secure: false
       rewrite: true
+      headers:
+        Host: roadmap.localhost
+      strip_path: false
     env:
       NODE_ENV: production
       PORT: 8080
