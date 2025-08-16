@@ -48,9 +48,15 @@ RUN npm ci --only=production && npm install -g ts-node typescript && npm cache c
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/public ./public
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nestjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nestjs:nodejs /app/healthcheck.js ./healthcheck.js
 COPY --chown=nestjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+
+# Verificar se os arquivos foram copiados corretamente
+RUN ls -la /app/public && \
+    ls -la /app/scripts && \
+    ls -la /app/dist
 
 # Dar permissão de execução para o entrypoint
 RUN chmod +x ./docker-entrypoint.sh

@@ -9,10 +9,11 @@ services:
     proxy:
       port: 8080
       secure: false
-      rewrite: true
+      rewrite: false
       headers:
         Host: roadmap.localhost
       strip_path: false
+      websocket: true
     env:
       NODE_ENV: production
       PORT: 8080
