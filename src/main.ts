@@ -104,8 +104,7 @@ async function bootstrap() {
 		}),
 	);
 
-	// Adicionar interceptor global para transformar respostas
-	app.useGlobalInterceptors(new TransformInterceptor());
+	// O interceptor global é fornecido pelo CommonModule
 
 	// Configurar Swagger
 	const config = new DocumentBuilder()

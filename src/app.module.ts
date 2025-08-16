@@ -16,13 +16,13 @@ import { BadgesModule } from "./badges/badges.module";
 import { HealthModule } from "./health/health.module";
 
 import { PrismaService } from "./prisma/prisma.service";
-import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
-import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
-import { ApiResponseService } from "./common/services/api-response.service";
+import { APP_FILTER } from "@nestjs/core";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
+import { CommonModule } from "./common/common.module";
 
 @Module({
 	imports: [
+		CommonModule,
 		CacheModule.register({
 			ttl: 60000, // 1 minuto
 			max: 100, // máximo 100 itens no cache
@@ -48,14 +48,9 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 	providers: [
 		AppService,
 		PrismaService,
-		ApiResponseService,
 		{
 			provide: APP_FILTER,
 			useClass: GlobalExceptionFilter,
-		},
-		{
-			provide: APP_INTERCEPTOR,
-			useClass: TransformInterceptor,
 		},
 	],
 })
