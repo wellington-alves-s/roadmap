@@ -24,31 +24,43 @@ async function bootstrap() {
 	});
 
 	// Configurar pasta de arquivos estáticos
+	console.log("🔍 Procurando diretório public...");
+	console.log("📁 Diretório atual:", process.cwd());
+	console.log("📁 Conteúdo do diretório atual:", require("fs").readdirSync(process.cwd()));
+
 	const publicDir = join(process.cwd(), "public");
-	console.log("📁 Diretório public:", publicDir);
-	
+	console.log("📁 Caminho do diretório public:", publicDir);
+
 	if (!existsSync(publicDir)) {
 		console.error("❌ Diretório public não encontrado!");
-		console.log("Conteúdo do diretório atual:", process.cwd());
 		process.exit(1);
 	}
 
-	if (!existsSync(join(publicDir, "index.html"))) {
+	console.log("📁 Conteúdo do diretório public:", require("fs").readdirSync(publicDir));
+
+	const indexPath = join(publicDir, "index.html");
+	if (!existsSync(indexPath)) {
 		console.error("❌ Arquivo index.html não encontrado!");
-		console.log("Conteúdo do diretório public:");
-		console.log(require("fs").readdirSync(publicDir));
 		process.exit(1);
 	}
 
-	app.useStaticAssets(publicDir);
-	
-	// Middleware para servir o frontend em todas as rotas não-API
+	console.log("✅ Arquivo index.html encontrado!");
+
+	// Configurar pasta de arquivos estáticos
+	app.useStaticAssets(publicDir, {
+		index: false,
+		fallthrough: true,
+	});
+
+	// Middleware para servir o frontend
 	app.use((req, res, next) => {
-		if (!req.path.startsWith("/api")) {
-			res.sendFile(join(publicDir, "index.html"));
+		if (req.path.startsWith("/api")) {
+			next();
 			return;
 		}
-		next();
+		
+		console.log("🌐 Servindo index.html para:", req.path);
+		res.sendFile(indexPath);
 	});
 
 	// Configurar prefixo global da API
