@@ -9,8 +9,17 @@ services:
     proxy:
       port: 8080
       secure: false
-      rewrite: true
+      rewrite: false
       websocket: true
+      headers:
+        X-Forwarded-Proto: http
+        X-Real-IP: $remote_addr
+        X-Forwarded-For: $proxy_add_x_forwarded_for
+        Host: $host
+      locations:
+        /:
+          proxy_pass: http://localhost:8080
+          proxy_set_header: Host $host
     env:
       NODE_ENV: production
       PORT: 8080

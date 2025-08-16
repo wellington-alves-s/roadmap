@@ -25,41 +25,59 @@ async function bootstrap() {
 
 	// Configurar pasta de arquivos estáticos
 	console.log("🔍 Procurando diretório public...");
-	console.log("📁 Diretório atual:", process.cwd());
-	console.log("📁 Conteúdo do diretório atual:", require("fs").readdirSync(process.cwd()));
+	
+	const possiblePublicDirs = [
+		join(process.cwd(), "public"),
+		join(__dirname, "..", "public"),
+		join(__dirname, "..", "..", "public")
+	];
 
-	const publicDir = join(process.cwd(), "public");
-	console.log("📁 Caminho do diretório public:", publicDir);
+	let publicDir: string | undefined;
+	let indexPath: string | undefined;
 
-	if (!existsSync(publicDir)) {
+	for (const dir of possiblePublicDirs) {
+		console.log("📁 Verificando:", dir);
+		if (existsSync(dir) && existsSync(join(dir, "index.html"))) {
+			publicDir = dir;
+			indexPath = join(dir, "index.html");
+			console.log("✅ Diretório public encontrado em:", dir);
+			console.log("📁 Conteúdo:", require("fs").readdirSync(dir));
+			break;
+		}
+	}
+
+	if (!publicDir || !indexPath) {
 		console.error("❌ Diretório public não encontrado!");
+		console.error("Diretórios verificados:", possiblePublicDirs);
 		process.exit(1);
 	}
-
-	console.log("📁 Conteúdo do diretório public:", require("fs").readdirSync(publicDir));
-
-	const indexPath = join(publicDir, "index.html");
-	if (!existsSync(indexPath)) {
-		console.error("❌ Arquivo index.html não encontrado!");
-		process.exit(1);
-	}
-
-	console.log("✅ Arquivo index.html encontrado!");
 
 	// Configurar pasta de arquivos estáticos
 	app.useStaticAssets(publicDir, {
 		index: false,
-		fallthrough: true,
+		serveRoot: "/",
 	});
 
 	// Middleware para servir o frontend
 	app.use((req, res, next) => {
-		if (req.path.startsWith("/api")) {
+		const path = req.path;
+		console.log("🌐 Requisição recebida:", path);
+
+		if (path.startsWith("/api")) {
+			console.log("👉 Encaminhando para API:", path);
 			next();
 			return;
 		}
-		
-		console.log("🌐 Servindo index.html para:", req.path);
+
+		// Verificar se é um arquivo estático
+		const staticFile = join(publicDir, path);
+		if (existsSync(staticFile) && !path.endsWith("/")) {
+			console.log("📄 Servindo arquivo estático:", path);
+			res.sendFile(staticFile);
+			return;
+		}
+
+		console.log("📱 Servindo index.html para:", path);
 		res.sendFile(indexPath);
 	});
 
