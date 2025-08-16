@@ -1,5 +1,7 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Res } from "@nestjs/common";
+import { Response } from "express";
 import { AppService } from "./app.service";
+import { join } from "path";
 
 @Controller()
 export class AppController {
@@ -13,5 +15,13 @@ export class AppController {
 			service: "roadmap-app",
 			environment: process.env.NODE_ENV || "development"
 		};
+	}
+
+	@Get("*")
+	serveApp(@Res() res: Response) {
+		const publicDir = join(process.cwd(), "public");
+		const indexPath = join(publicDir, "index.html");
+		console.log("🌐 Servindo aplicação de:", indexPath);
+		return res.sendFile(indexPath);
 	}
 }

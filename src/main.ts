@@ -55,7 +55,7 @@ async function bootstrap() {
 	// Configurar pasta de arquivos estáticos
 	app.useStaticAssets(publicDir, {
 		index: false,
-		serveRoot: "/",
+		prefix: "/",
 	});
 
 	// Middleware para servir o frontend
