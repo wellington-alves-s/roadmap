@@ -91,7 +91,7 @@ async function bootstrap() {
 	// Configurar prefixo global da API
 	app.setGlobalPrefix("api");
 
-	// Configurar validação global
+	// Configurar validação global e transformação de resposta
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
@@ -102,6 +102,9 @@ async function bootstrap() {
 			},
 		}),
 	);
+
+	// Adicionar interceptor global para transformar respostas
+	app.useGlobalInterceptors(new TransformInterceptor());
 
 	// Configurar Swagger
 	const config = new DocumentBuilder()

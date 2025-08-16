@@ -16,7 +16,8 @@ import { BadgesModule } from "./badges/badges.module";
 import { HealthModule } from "./health/health.module";
 
 import { PrismaService } from "./prisma/prisma.service";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
+import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 
 @Module({
@@ -49,6 +50,10 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 		{
 			provide: APP_FILTER,
 			useClass: GlobalExceptionFilter,
+		},
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: TransformInterceptor,
 		},
 	],
 })
