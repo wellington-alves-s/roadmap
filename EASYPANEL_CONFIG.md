@@ -31,9 +31,15 @@ JWT_EXPIRES_IN=7d
 
 ## 🆘 Se der erro
 
-1. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
-2. **Build failed**: Verifique logs no EasyPanel
-3. **Port 3003 not accessible**: Confirme configuração de rede
+1. **"nest: not found" durante build**: ✅ CORRIGIDO - Dockerfile atualizado
+2. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
+3. **Build failed**: Verifique logs no EasyPanel
+4. **Port 3003 not accessible**: Confirme configuração de rede
+
+### 🔧 Problemas de Build Resolvidos
+- ✅ Instalação de devDependencies no estágio de build
+- ✅ NestJS CLI disponível para `npm run build`
+- ✅ Multi-stage build otimizado
 
 ---
 **🎯 Pronto! Seu Roadmap App estará online!**

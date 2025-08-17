@@ -16,8 +16,8 @@ COPY yarn.lock* ./
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-# Instalar dependências
-RUN npm ci --only=production && npm cache clean --force
+# Instalar TODAS as dependências (incluindo devDependencies para o build)
+RUN npm ci && npm cache clean --force
 
 # Copiar código fonte
 COPY . .
@@ -41,11 +41,13 @@ RUN adduser --system --uid 1001 nestjs
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Copiar dependências de produção
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+# Instalar apenas dependências de produção no estágio final
+COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar arquivos buildados
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/public ./public
-COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
 # Configurar usuário
