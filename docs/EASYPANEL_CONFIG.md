@@ -1,5 +1,7 @@
 # ⚡ Configuração Rápida - EasyPanel
 
+> 🔒 **NOTA IMPORTANTE**: Credenciais sensíveis estão no arquivo `SENSITIVE_CONFIG.md` (não versionado por segurança)
+
 ## 🔧 Variáveis de Ambiente para Copiar/Colar
 
 **Cole EXATAMENTE estas variáveis no seu EasyPanel:**
@@ -7,10 +9,12 @@
 ```
 PORT=3003
 NODE_ENV=production
-DATABASE_URL=mysql://mysql:469f4f45a99c2b340104@app_roadmap_db:3306/roadmap_db
-JWT_SECRET=1890dc921347d0c56f5bf2f80cd7106e7780de29ade14ca634d2bd30ec89f95b034027cf4cec69888c3de00dd80c9ecf1bcaeac2d98c686c686ae01a1d3ac82f
+DATABASE_URL=mysql://[USER]:[PASSWORD]@[HOST]:3306/[DATABASE]
+JWT_SECRET=[SUA_CHAVE_JWT_SECRETA]
 JWT_EXPIRES_IN=7d
 ```
+
+📋 **IMPORTANTE**: As credenciais reais estão no arquivo `SENSITIVE_CONFIG.md` (não versionado)
 
 ## 📋 Checklist Rápido
 
@@ -104,19 +108,13 @@ JWT_EXPIRES_IN=7d
 
 2. **🔧 AÇÃO NECESSÁRIA**: Atualizar variáveis de ambiente
    - No EasyPanel, vá para seu app Roadmap
-   - Atualize a variável `DATABASE_URL`:
-   ```
-   DATABASE_URL=mysql://mysql:469f4f45a99c2b340104@app_roadmap_db:3306/roadmap_db
-   ```
+   - Consulte `SENSITIVE_CONFIG.md` para as credenciais
+   - Atualize a variável `DATABASE_URL` com os valores corretos
 
-3. **📋 Credenciais Corretas**:
+3. **📋 Credenciais**: 
    ```
-   Host: app_roadmap_db
-   Username: mysql  
-   Password: 469f4f45a99c2b340104
-   Database: roadmap_db
-   Root Password: fcecff3dddcb74bfa9de
-   Port: 3306
+   📄 Consulte o arquivo SENSITIVE_CONFIG.md
+   🔒 (Arquivo não versionado por segurança)
    ```
 
 4. **🔄 Restart do app Roadmap**:
@@ -199,11 +197,12 @@ Para gerenciar o banco de dados visualmente, configure um serviço phpMyAdmin:
 **2. Variáveis de Ambiente do phpMyAdmin**:
 ```
 PMA_ARBITRARY=1
-PMA_HOST=app_roadmap_db
+PMA_HOST=[HOST_DO_BANCO]
 PMA_PORT=3306
-PMA_USER=mysql
-PMA_PASSWORD=469f4f45a99c2b340104
+PMA_USER=[USUARIO]
+PMA_PASSWORD=[SENHA]
 ```
+📋 **Valores reais**: Consulte `SENSITIVE_CONFIG.md`
 
 **3. Configuração de Rede**:
 - Conectar à mesma rede do banco `app_roadmap_db`
@@ -217,10 +216,13 @@ Após configurar, acesse via:
 
 ### 🔑 **Credenciais de Login**
 
-- **Servidor**: `app_roadmap_db:3306`
-- **Usuário**: `mysql`
-- **Senha**: `469f4f45a99c2b340104`
-- **Banco de Dados**: `roadmap_db`
+```
+📄 Consulte SENSITIVE_CONFIG.md para:
+- Servidor e porta
+- Usuário e senha
+- Nome do banco de dados
+🔒 (Informações não versionadas por segurança)
+```
 
 ### 📊 **Funcionalidades Disponíveis**
 

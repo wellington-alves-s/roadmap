@@ -42,6 +42,12 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Sensitive configuration files
+docs/SENSITIVE_CONFIG.md
+*_SENSITIVE.md
+credentials.md
+secrets.md
+
 # temp directory
 .temp
 .tmp
