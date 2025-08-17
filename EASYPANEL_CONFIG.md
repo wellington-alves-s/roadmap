@@ -133,4 +133,55 @@ JWT_EXPIRES_IN=7d
 **📁 ARQUIVO**: `database_setup.sql` - Script completo de inicialização com dados
 
 ---
-**🎯 ÚLTIMO PASSO**: Atualize DATABASE_URL no EasyPanel e restart o app!**
+
+## 🌐 **Acesso Remoto com Cloudflare Tunnel**
+
+### 📋 **URLs Locais do App (EasyPanel)**
+- **🏠 Frontend**: `http://localhost` (não use porta :3003)
+- **📚 API Docs**: `http://localhost/api/docs`
+- **🔍 Health Check**: `http://localhost/api/v1/health/check`  
+- **🌱 Popular Dados**: `http://localhost/api/v1/seed`
+
+### 🚀 **Configurar Cloudflare Tunnel**
+
+**Opção 1 - Túnel Temporário (Teste Rápido)**:
+```bash
+# Instalar cloudflared primeiro
+cloudflared tunnel --url http://localhost
+```
+Retorna URL como: `https://abc123.trycloudflare.com`
+
+**Opção 2 - Túnel Permanente**:
+```bash
+# 1. Autenticar
+cloudflared tunnel login
+
+# 2. Criar túnel
+cloudflared tunnel create roadmap-app
+
+# 3. Configurar DNS  
+cloudflared tunnel route dns roadmap-app roadmap.seudominio.com
+
+# 4. Executar
+cloudflared tunnel run --url http://localhost roadmap-app
+```
+
+**Opção 3 - Dashboard Cloudflare**:
+- Zero Trust → Tunnels → Create
+- Public hostname: `roadmap.seudominio.com`
+- Service: `http://localhost:80` (NÃO :3003)
+
+### ⚠️ **IMPORTANTE**:
+- ✅ Use `http://localhost` (porta 80 - proxy EasyPanel)
+- ❌ NÃO use `http://localhost:3003` (porta interna do container)
+
+### 🌐 **URLs Públicas após Tunnel**:
+```
+🏠 App: https://roadmap.seudominio.com
+📚 API: https://roadmap.seudominio.com/api/docs
+🔍 Health: https://roadmap.seudominio.com/api/v1/health/check
+🌱 Seed: https://roadmap.seudominio.com/api/v1/seed
+```
+
+---
+**🎯 DEPLOY COMPLETO**: App funcionando localmente + acesso remoto via Cloudflare!**
