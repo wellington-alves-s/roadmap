@@ -184,4 +184,58 @@ cloudflared tunnel run --url http://localhost roadmap-app
 ```
 
 ---
-**🎯 DEPLOY COMPLETO**: App funcionando localmente + acesso remoto via Cloudflare!**
+
+## 🗄️ **Acesso ao Banco de Dados via phpMyAdmin**
+
+### 📋 **Configuração do phpMyAdmin no EasyPanel**
+
+Para gerenciar o banco de dados visualmente, configure um serviço phpMyAdmin:
+
+**1. Criar Serviço phpMyAdmin**:
+- No EasyPanel → Services → Create Service
+- Service Type: **phpMyAdmin**
+- Service Name: **phpmyadmin-roadmap**
+
+**2. Variáveis de Ambiente do phpMyAdmin**:
+```
+PMA_ARBITRARY=1
+PMA_HOST=app_roadmap_db
+PMA_PORT=3306
+PMA_USER=mysql
+PMA_PASSWORD=469f4f45a99c2b340104
+```
+
+**3. Configuração de Rede**:
+- Conectar à mesma rede do banco `app_roadmap_db`
+- Porta de acesso: 80 (padrão)
+
+### 🌐 **Acesso ao phpMyAdmin**
+
+Após configurar, acesse via:
+- **Local**: `http://localhost:[porta-do-phpmyadmin]`
+- **Com Cloudflare**: Configure túnel para o phpMyAdmin também
+
+### 🔑 **Credenciais de Login**
+
+- **Servidor**: `app_roadmap_db:3306`
+- **Usuário**: `mysql`
+- **Senha**: `469f4f45a99c2b340104`
+- **Banco de Dados**: `roadmap_db`
+
+### 📊 **Funcionalidades Disponíveis**
+
+Com phpMyAdmin você pode:
+- ✅ Visualizar tabelas e dados
+- ✅ Executar queries SQL
+- ✅ Importar/exportar dados
+- ✅ Gerenciar usuários e permissões
+- ✅ Monitorar performance do banco
+
+### 🚀 **Alternativa: Acesso via API**
+
+Se preferir não usar phpMyAdmin, use os endpoints da API:
+- **Popular dados**: `http://localhost/api/v1/seed`
+- **Health check DB**: `http://localhost/api/v1/health/check`
+
+---
+**🎯 DEPLOY COMPLETO**: App + Banco + phpMyAdmin funcionando!**
