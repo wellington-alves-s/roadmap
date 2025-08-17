@@ -25,24 +25,29 @@ COPY . .
 # Gerar cliente Prisma
 RUN npx prisma generate
 
-# Limpar diretório dist se existir
+# Limpar diretório dist completamente
 RUN rm -rf dist
 
-# Build da aplicação usando TypeScript diretamente primeiro
-RUN npx tsc -p tsconfig.build.json
+# Build usando NestJS CLI diretamente (mais confiável)
+RUN echo "=== Iniciando build com nest cli ===" && \
+    npx nest build && \
+    echo "=== Build concluído ===" && \
+    ls -la dist/
 
-# Debug: verificar se main.js foi gerado
-RUN echo "=== Arquivos após tsc ===" && ls -la dist/ || echo "dist não existe ainda"
-
-# Se main.js não existir, usar nest build
+# Verificar se main.js foi gerado corretamente
 RUN if [ ! -f "dist/main.js" ]; then \
-      echo "main.js não encontrado, usando nest build..."; \
-      npx nest build; \
+      echo "❌ ERRO: main.js não foi gerado!"; \
+      echo "=== Conteúdo do diretório dist: ==="; \
+      find dist -type f -name "*.js" | head -10; \
+      echo "=== Tentando build com tsc diretamente ==="; \
+      npx tsc -p tsconfig.build.json --outDir dist; \
+      echo "=== Arquivos após tsc: ==="; \
+      find dist -name "main.js" -o -name "*.js" | head -5; \
+      exit 1; \
+    else \
+      echo "✅ main.js encontrado com sucesso"; \
+      ls -la dist/main.js; \
     fi
-
-# Debug: listar arquivos finais
-RUN echo "=== Arquivos finais ===" && ls -la dist/ && \
-    echo "=== Verificando main.js ===" && ls -la dist/main.js
 
 # Estágio de produção
 FROM node:18-alpine AS production

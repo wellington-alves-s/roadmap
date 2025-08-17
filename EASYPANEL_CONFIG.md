@@ -34,9 +34,11 @@ JWT_EXPIRES_IN=7d
 1. **"nest: not found" durante build**: ✅ CORRIGIDO - Dockerfile atualizado
 2. **"Cannot find module '/app/dist/main.js'"**: ✅ CORRIGIDO - Build TypeScript
 3. **Build não gera arquivos .js**: ✅ CORRIGIDO - Múltiplas estratégias de build
-4. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
-5. **Build failed**: Verifique logs no EasyPanel
-6. **Port 3003 not accessible**: Confirme configuração de rede
+4. **"main.js: No such file or directory"**: ✅ CORRIGIDO - Dockerfile com verificações robustas
+5. **Build falha no nest build**: ✅ CORRIGIDO - Fallback para TypeScript direto
+6. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
+7. **Build failed**: Verifique logs no EasyPanel
+8. **Port 3003 not accessible**: Confirme configuração de rede
 
 ### 🔧 Problemas de Build Resolvidos
 - ✅ Instalação de devDependencies no estágio de build
@@ -47,11 +49,27 @@ JWT_EXPIRES_IN=7d
 - ✅ Multi-stage build otimizado
 
 ### 📁 Dockerfiles Disponíveis
-- `Dockerfile` - Principal (multi-stage) com build robusto
+- `Dockerfile` - **PRINCIPAL** - Multi-stage com NestJS CLI + fallbacks
+- `Dockerfile.robust` - **RECOMENDADO** - 3 estratégias de build + debug completo
 - `Dockerfile.simple` - Alternativo simples
-- `Dockerfile.npm` - Usando npm script
+- `Dockerfile.npm` - Usando npm script  
 - `Dockerfile.fixed` - Build com verificações extras
-- `Dockerfile.direct` - **RECOMENDADO** - Build direto com debug completo
+- `Dockerfile.direct` - Build direto com debug completo
+
+### 🔧 Solução para "main.js not found"
+
+**Problema**: Build não gera `dist/main.js` corretamente
+
+**Causa**: Configuração incorreta do `nest-cli.json` e `tsconfig.build.json`
+
+**Soluções aplicadas**:
+1. ✅ Corrigido `nest-cli.json`: `deleteOutDir: true`
+2. ✅ Melhorado `tsconfig.build.json` com `rootDir` e `include`
+3. ✅ Dockerfile com múltiplas estratégias de build
+4. ✅ Fallback automático para TypeScript direto
+5. ✅ Verificações robustas em cada etapa
+
+**Se ainda falhar**, use: `Dockerfile.robust` com 3 estratégias de build
 
 ---
 **🎯 Pronto! Seu Roadmap App estará online!**
