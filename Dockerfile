@@ -25,11 +25,24 @@ COPY . .
 # Gerar cliente Prisma
 RUN npx prisma generate
 
-# Build da aplicação
-RUN npm run build
+# Limpar diretório dist se existir
+RUN rm -rf dist
 
-# Debug: listar arquivos gerados
-RUN ls -la dist/
+# Build da aplicação usando TypeScript diretamente primeiro
+RUN npx tsc -p tsconfig.build.json
+
+# Debug: verificar se main.js foi gerado
+RUN echo "=== Arquivos após tsc ===" && ls -la dist/ || echo "dist não existe ainda"
+
+# Se main.js não existir, usar nest build
+RUN if [ ! -f "dist/main.js" ]; then \
+      echo "main.js não encontrado, usando nest build..."; \
+      npx nest build; \
+    fi
+
+# Debug: listar arquivos finais
+RUN echo "=== Arquivos finais ===" && ls -la dist/ && \
+    echo "=== Verificando main.js ===" && ls -la dist/main.js
 
 # Estágio de produção
 FROM node:18-alpine AS production

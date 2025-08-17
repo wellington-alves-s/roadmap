@@ -1,0 +1,80 @@
+# Dockerfile Direto - Sem Multi-stage para Debug
+FROM node:18-alpine
+
+# Instalar dependências do sistema
+RUN apk add --no-cache dumb-init
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de configuração
+COPY package*.json ./
+COPY yarn.lock* ./
+
+# Instalar todas as dependências
+RUN npm ci
+
+# Copiar configurações TypeScript e NestJS
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
+# Copiar código fonte
+COPY src/ ./src/
+COPY public/ ./public/
+COPY prisma/ ./prisma/
+
+# Gerar cliente Prisma
+RUN npx prisma generate
+
+# Verificar estrutura antes do build
+RUN echo "=== Estrutura antes do build ===" && ls -la
+
+# Build usando método direto
+RUN echo "=== Tentando nest build ===" && \
+    npx nest build || echo "nest build falhou"
+
+# Se falhou, tentar tsc direto
+RUN echo "=== Verificando dist após nest build ===" && \
+    ls -la dist/ || echo "dist não existe"
+
+# Tentar tsc se nest build não funcionou
+RUN if [ ! -f "dist/main.js" ]; then \
+      echo "=== Tentando tsc direto ==="; \
+      npx tsc --project tsconfig.json --outDir dist; \
+    fi
+
+# Verificar resultado final
+RUN echo "=== Resultado final ===" && \
+    ls -la dist/ && \
+    echo "=== Conteúdo de dist ===" && \
+    find dist -name "*.js" | head -10
+
+# Criar o main.js manualmente se necessário
+RUN if [ ! -f "dist/main.js" ]; then \
+      echo "=== Criando main.js manualmente ==="; \
+      mkdir -p dist; \
+      npx tsc src/main.ts --outDir dist --module commonjs --target es2022 --experimentalDecorators --emitDecoratorMetadata; \
+    fi
+
+# Verificação final obrigatória
+RUN ls -la dist/main.js
+
+# Remover devDependencies
+RUN npm prune --production
+
+# Criar usuário
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nestjs && \
+    chown -R nestjs:nodejs /app
+
+USER nestjs
+
+# Expor porta
+EXPOSE 3003
+
+# Variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=3003
+
+# Comando de inicialização
+CMD ["dumb-init", "node", "dist/main.js"]
