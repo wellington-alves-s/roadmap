@@ -93,9 +93,9 @@ EXPOSE 3003
 ENV NODE_ENV=production
 ENV PORT=3003
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3003/api/health/check', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+# Health check  
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3003/api/v1/health/check', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Comando de inicialização
 CMD ["dumb-init", "node", "dist/main.js"]
