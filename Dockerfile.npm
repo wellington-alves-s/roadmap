@@ -1,6 +1,4 @@
-# Dockerfile Simplificado para Roadmap App - EasyPanel Deploy
-# Versão mais direta sem multi-stage build
-
+# Dockerfile alternativo usando npm start:prod
 FROM node:18-alpine
 
 # Instalar dependências do sistema
@@ -54,5 +52,5 @@ ENV PORT=3003
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3003/api/health/check', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Comando de inicialização
-CMD ["dumb-init", "node", "dist/main.js"]
+# Comando de inicialização usando npm script
+CMD ["dumb-init", "npm", "run", "start:prod"]

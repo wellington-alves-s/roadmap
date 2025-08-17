@@ -32,14 +32,23 @@ JWT_EXPIRES_IN=7d
 ## 🆘 Se der erro
 
 1. **"nest: not found" durante build**: ✅ CORRIGIDO - Dockerfile atualizado
-2. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
-3. **Build failed**: Verifique logs no EasyPanel
-4. **Port 3003 not accessible**: Confirme configuração de rede
+2. **"Cannot find module '/app/dist/main'"**: ✅ CORRIGIDO - Arquivo main.js
+3. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
+4. **Build failed**: Verifique logs no EasyPanel
+5. **Port 3003 not accessible**: Confirme configuração de rede
 
 ### 🔧 Problemas de Build Resolvidos
 - ✅ Instalação de devDependencies no estágio de build
 - ✅ NestJS CLI disponível para `npm run build`
+- ✅ Comando de inicialização corrigido: `dist/main.js`
+- ✅ Script npm start:prod atualizado
+- ✅ Debug logs adicionados para troubleshooting
 - ✅ Multi-stage build otimizado
+
+### 📁 Dockerfiles Disponíveis
+- `Dockerfile` - Principal (multi-stage)
+- `Dockerfile.simple` - Alternativo simples
+- `Dockerfile.npm` - Usando npm script
 
 ---
 **🎯 Pronto! Seu Roadmap App estará online!**

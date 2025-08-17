@@ -28,6 +28,9 @@ RUN npx prisma generate
 # Build da aplicação
 RUN npm run build
 
+# Debug: listar arquivos gerados
+RUN ls -la dist/
+
 # Estágio de produção
 FROM node:18-alpine AS production
 
@@ -50,6 +53,9 @@ COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/public ./public
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
+# Debug: verificar arquivos copiados
+RUN ls -la dist/
+
 # Configurar usuário
 USER nestjs
 
@@ -65,4 +71,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3003/api/health/check', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Comando de inicialização
-CMD ["dumb-init", "node", "dist/main"]
+CMD ["dumb-init", "node", "dist/main.js"]
