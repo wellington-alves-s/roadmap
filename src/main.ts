@@ -11,7 +11,7 @@ async function bootstrap() {
 
 	// Configurar CORS
 	app.enableCors({
-		origin: ["http://localhost:8080", "http://127.0.0.1:8080", "file://"],
+		origin: ["http://localhost:3003", "http://127.0.0.1:3003", "http://localhost:8080", "http://127.0.0.1:8080", "file://"],
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
@@ -81,7 +81,7 @@ async function bootstrap() {
 		},
 	});
 
-	const port = process.env.PORT || 8080;
+	const port = process.env.PORT || 3003;
 	await app.listen(port);
 	console.log(`🚀 Application is running on: http://localhost:${port}`);
 	console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
