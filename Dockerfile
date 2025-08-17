@@ -62,17 +62,26 @@ RUN adduser --system --uid 1001 nestjs
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Instalar apenas dependências de produção no estágio final
+# Copiar package.json e schema do Prisma primeiro
 COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+
+# Instalar dependências de produção E gerar o Prisma Client
+RUN npm ci --only=production && \
+    npx prisma generate && \
+    npm cache clean --force
 
 # Copiar arquivos buildados
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/public ./public
-COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
-# Debug: verificar arquivos copiados
-RUN ls -la dist/
+# Debug: verificar arquivos copiados e Prisma Client
+RUN echo "=== Verificando arquivos copiados ===" && \
+    ls -la dist/ && \
+    echo "=== Verificando Prisma Client ===" && \
+    ls -la node_modules/.prisma/client/ || echo "Prisma client não encontrado" && \
+    echo "=== Testando import do Prisma ===" && \
+    node -e "try { require('@prisma/client'); console.log('✅ Prisma Client OK'); } catch(e) { console.log('❌ Prisma Client ERRO:', e.message); }"
 
 # Configurar usuário
 USER nestjs

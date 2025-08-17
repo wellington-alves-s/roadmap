@@ -36,9 +36,11 @@ JWT_EXPIRES_IN=7d
 3. **Build não gera arquivos .js**: ✅ CORRIGIDO - Múltiplas estratégias de build
 4. **"main.js: No such file or directory"**: ✅ CORRIGIDO - Dockerfile com verificações robustas
 5. **Build falha no nest build**: ✅ CORRIGIDO - Fallback para TypeScript direto
-6. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
-7. **Build failed**: Verifique logs no EasyPanel
-8. **Port 3003 not accessible**: Confirme configuração de rede
+6. **"@prisma/client did not initialize yet"**: ✅ CORRIGIDO - Prisma generate no estágio de produção
+7. **Prisma Client não encontrado em produção**: ✅ CORRIGIDO - Generate após npm install
+8. **Database connection failed**: Verifique se `app_database_roadmap` está rodando
+9. **Build failed**: Verifique logs no EasyPanel
+10. **Port 3003 not accessible**: Confirme configuração de rede
 
 ### 🔧 Problemas de Build Resolvidos
 - ✅ Instalação de devDependencies no estágio de build
@@ -70,6 +72,20 @@ JWT_EXPIRES_IN=7d
 5. ✅ Verificações robustas em cada etapa
 
 **Se ainda falhar**, use: `Dockerfile.robust` com 3 estratégias de build
+
+### 🗄️ Solução para "@prisma/client did not initialize yet"
+
+**Problema**: Prisma Client não está disponível no estágio de produção
+
+**Causa**: `npx prisma generate` só roda no build, mas precisa rodar também na produção
+
+**Soluções aplicadas**:
+1. ✅ `npx prisma generate` executado no estágio de produção
+2. ✅ Schema do Prisma copiado antes da instalação
+3. ✅ Verificações de import do Prisma Client
+4. ✅ Ordem correta: schema → install → generate → build
+
+**Resultado**: Prisma Client agora funciona em produção
 
 ---
 **🎯 Pronto! Seu Roadmap App estará online!**
