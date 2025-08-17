@@ -21,20 +21,20 @@
 # Comando: Automático (definido no Dockerfile)
 ```
 
-### 3. **Variáveis de Ambiente Obrigatórias**
+### 3. **Variáveis de Ambiente Configuradas** ✅
 
-Configure no painel do EasyPanel:
+Configure no painel do EasyPanel EXATAMENTE estas variáveis:
 
 ```env
 # Aplicação
 PORT=3003
 NODE_ENV=production
 
-# Banco de Dados (ajuste conforme seu MySQL)
-DATABASE_URL=mysql://seu_usuario:sua_senha@seu_host_mysql:3306/roadmap_db
+# Banco de Dados MySQL (seus dados específicos)
+DATABASE_URL=mysql://mysql:61ebffc6e00b52add90f@app_database_roadmap:3306/roadmap_db
 
-# Segurança (GERE UMA CHAVE SEGURA!)
-JWT_SECRET=sua-chave-jwt-super-secreta-e-unica
+# Segurança (chave JWT gerada automaticamente)
+JWT_SECRET=1890dc921347d0c56f5bf2f80cd7106e7780de29ade14ca634d2bd30ec89f95b034027cf4cec69888c3de00dd80c9ecf1bcaeac2d98c686c686ae01a1d3ac82f
 JWT_EXPIRES_IN=7d
 ```
 
@@ -54,16 +54,20 @@ JWT_EXPIRES_IN=7d
 - **Memória**: 1GB
 - **Storage**: 2GB
 
-## 🗄️ Configuração do Banco de Dados
+## 🗄️ Configuração do Banco de Dados ✅
 
-### String de Conexão
+### Seus Dados MySQL Configurados
 ```
-mysql://[usuario]:[senha]@[host]:[porta]/[database]
+Usuário: mysql
+Senha: 61ebffc6e00b52add90f
+Host Interno: app_database_roadmap
+Porta: 3306
+Database: roadmap_db
 ```
 
-**Exemplo:**
+**String de Conexão Configurada:**
 ```
-mysql://roadmap_user:minha_senha_segura@mysql-roadmap:3306/roadmap_db
+mysql://mysql:61ebffc6e00b52add90f@app_database_roadmap:3306/roadmap_db
 ```
 
 ### Verificar Conectividade
