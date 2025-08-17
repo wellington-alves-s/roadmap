@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#4F46E5"/>
+  
+  <!-- Roadmap icon -->
+  <path d="M8 12h6l3 3h7v2h-7l-3-3H8v-2z" fill="white"/>
+  <path d="M8 18h4l3 3h9v2h-9l-3-3H8v-2z" fill="white"/>
+  <path d="M8 24h8v2H8v-2z" fill="white"/>
+  
+  <!-- Progress dots -->
+  <circle cx="6" cy="13" r="1.5" fill="#10B981"/>
+  <circle cx="6" cy="19" r="1.5" fill="#F59E0B"/>
+  <circle cx="6" cy="25" r="1.5" fill="#EF4444"/>
+</svg>
