@@ -75,6 +75,23 @@ export class UsersService {
 		});
 	}
 
+	async updatePassword(id: number, hashedPassword: string) {
+		const user = await this.prisma.user.findUnique({
+			where: { id },
+		});
+
+		if (!user) {
+			throw new NotFoundException("Usuário não encontrado");
+		}
+
+		await this.prisma.user.update({
+			where: { id },
+			data: { password: hashedPassword },
+		});
+
+		return { message: "Senha atualizada com sucesso" };
+	}
+
 	async remove(id: number) {
 		const user = await this.prisma.user.findUnique({
 			where: { id },

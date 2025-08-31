@@ -5318,3 +5318,158 @@ document.addEventListener("keydown", (e) => {
 		navigateTimeline(1);
 	}
 });
+
+// ========================================
+// FORGOT PASSWORD FUNCTIONALITY
+// ========================================
+
+// Função para mostrar modal de esqueci a senha
+function showForgotPasswordModal() {
+	console.log("📧 Abrindo modal de esqueci a senha...");
+	const modal = document.getElementById("forgotPasswordModal");
+	if (modal) {
+		modal.style.display = "flex";
+		// Focar no campo de email
+		setTimeout(() => {
+			const emailInput = document.getElementById("forgotEmail");
+			if (emailInput) {
+				emailInput.focus();
+			}
+		}, 100);
+	}
+}
+
+// Função para fechar modal de esqueci a senha
+function closeForgotPasswordModal() {
+	console.log("❌ Fechando modal de esqueci a senha...");
+	const modal = document.getElementById("forgotPasswordModal");
+	if (modal) {
+		modal.style.display = "none";
+		// Limpar campo
+		const emailInput = document.getElementById("forgotEmail");
+		if (emailInput) {
+			emailInput.value = "";
+		}
+	}
+}
+
+// Função para enviar email de reset de senha
+async function handleForgotPassword(event) {
+	event.preventDefault();
+	console.log("📧 Processando reset de senha...");
+
+	const emailInput = document.getElementById("forgotEmail");
+	const email = emailInput.value.trim();
+
+	if (!email) {
+		window.showError("Por favor, digite seu email.");
+		return;
+	}
+
+	// Validar formato de email
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	if (!emailRegex.test(email)) {
+		window.showError("Por favor, digite um email válido.");
+		return;
+	}
+
+	const sendBtn = document.getElementById("sendResetBtn");
+	const originalText = sendBtn.innerHTML;
+
+	try {
+		// Desabilitar botão e mostrar loading
+		sendBtn.disabled = true;
+		sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+		console.log(`📧 Enviando email de reset para: ${email}`);
+
+		// Fazer requisição para o endpoint de forgot password
+		const response = await fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ email }),
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+			// Sucesso
+			window.showSuccess(data.message || `Instruções de reset foram enviadas para ${email}. Verifique sua caixa de entrada.`);
+		} else {
+			throw new Error(data.message || "Erro ao enviar email de reset");
+		}
+		
+		// Fechar modal
+		closeForgotPasswordModal();
+		
+		console.log("✅ Email de reset enviado com sucesso");
+
+	} catch (error) {
+		console.error("❌ Erro ao enviar email de reset:", error);
+		window.showError("Erro ao enviar email. Tente novamente mais tarde.");
+	} finally {
+		// Restaurar botão
+		sendBtn.disabled = false;
+		sendBtn.innerHTML = originalText;
+	}
+}
+
+// Event listeners para forgot password
+document.addEventListener("DOMContentLoaded", function() {
+	// Link "Esqueci a senha"
+	const showForgotLink = document.getElementById("showForgotPassword");
+	if (showForgotLink) {
+		showForgotLink.addEventListener("click", function(e) {
+			e.preventDefault();
+			showForgotPasswordModal();
+		});
+	}
+
+	// Botão fechar modal (X)
+	const closeModalBtn = document.getElementById("closeForgotPasswordModal");
+	if (closeModalBtn) {
+		closeModalBtn.addEventListener("click", function(e) {
+			e.preventDefault();
+			closeForgotPasswordModal();
+		});
+	}
+
+	// Link "Voltar ao Login"
+	const backToLoginLink = document.getElementById("backToLogin");
+	if (backToLoginLink) {
+		backToLoginLink.addEventListener("click", function(e) {
+			e.preventDefault();
+			closeForgotPasswordModal();
+		});
+	}
+
+	// Form de forgot password
+	const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+	if (forgotPasswordForm) {
+		forgotPasswordForm.addEventListener("submit", handleForgotPassword);
+	}
+
+	// Fechar modal clicando fora dele
+	const modal = document.getElementById("forgotPasswordModal");
+	if (modal) {
+		modal.addEventListener("click", function(e) {
+			if (e.target === modal) {
+				closeForgotPasswordModal();
+			}
+		});
+	}
+
+	// Fechar modal com ESC
+	document.addEventListener("keydown", function(e) {
+		if (e.key === "Escape") {
+			const modal = document.getElementById("forgotPasswordModal");
+			if (modal && modal.style.display === "flex") {
+				closeForgotPasswordModal();
+			}
+		}
+	});
+
+	console.log("✅ Event listeners de 'Esqueci a senha' configurados");
+});

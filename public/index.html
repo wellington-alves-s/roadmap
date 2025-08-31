@@ -99,30 +99,61 @@ Status: ✅ APROVADO PELO USUÁRIO
 				<p class="register-link">
 					Não tem conta? <a href="#" id="showRegister">Registrar</a>
 				</p>
+				<p class="forgot-password-link">
+					<a href="#" id="showForgotPassword">Esqueci a senha</a>
+				</p>
 			</div>
+		</div>
 
-			<div id="registerSection" class="register-section" style="display: none">
-				<div class="login-container">
-					<div class="login-header">
-						<h1><i class="fas fa-user-plus"></i> Criar Conta</h1>
-						<p>Registre-se para começar</p>
+		<div id="registerSection" class="register-section" style="display: none">
+			<div class="register-container">
+				<div class="register-header">
+					<h1><i class="fas fa-user-plus"></i> Criar Conta</h1>
+					<p>Registre-se para começar</p>
+				</div>
+
+				<form id="registerForm" onsubmit="return false;">
+					<div class="form-group">
+						<label for="registerEmail">Email:</label>
+						<input type="email" id="registerEmail" name="email" required />
 					</div>
+					<div class="form-group">
+						<label for="registerPassword">Senha:</label>
+						<input type="password" id="registerPassword" name="password" required />
+					</div>
+					<button type="submit" class="btn btn-primary">Registrar</button>
+				</form>
 
-					<form id="registerForm" onsubmit="return false;">
-						<div class="form-group">
-							<label for="registerEmail">Email:</label>
-							<input type="email" id="registerEmail" name="email" required />
-						</div>
-						<div class="form-group">
-							<label for="registerPassword">Senha:</label>
-							<input type="password" id="registerPassword" name="password" required />
-						</div>
-						<button type="submit" class="btn btn-primary">Registrar</button>
-					</form>
+				<p class="register-link">
+					Já tem conta? <a href="#" id="showLogin">Fazer Login</a>
+				</p>
+			</div>
+		</div>
 
-					<p class="register-link">
-						Já tem conta? <a href="#" id="showLogin">Fazer Login</a>
+		<!-- Forgot Password Modal -->
+		<div id="forgotPasswordModal" class="modal" style="display: none">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2><i class="fas fa-key"></i> Resetar Senha</h2>
+					<span class="close" id="closeForgotPasswordModal">&times;</span>
+				</div>
+				<div class="modal-body">
+					<p class="modal-description">
+						Digite seu email abaixo e enviaremos instruções para resetar sua senha.
 					</p>
+					<form id="forgotPasswordForm" onsubmit="return false;">
+						<div class="form-group">
+							<label for="forgotEmail">Email:</label>
+							<input type="email" id="forgotEmail" name="email" required 
+								   placeholder="Digite seu email cadastrado" />
+						</div>
+						<button type="submit" class="btn btn-primary" id="sendResetBtn">
+							<i class="fas fa-paper-plane"></i> Enviar Instruções
+						</button>
+					</form>
+					<div class="back-to-login">
+						<a href="#" id="backToLogin">← Voltar ao Login</a>
+					</div>
 				</div>
 			</div>
 		</div>
