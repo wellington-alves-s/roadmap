@@ -1,0 +1,239 @@
+/**
+ * ⚠️  AVISO CRÍTICO - SCHEMA PRISMA PROTEGIDO - NÃO ALTERAR ⚠️
+ * 
+ * Este schema define toda a estrutura do banco de dados do sistema de roadmap.
+ * 
+ * 🔒 ESTRUTURAS PROTEGIDAS:
+ * - Relacionamentos entre modelos
+ * - Índices de performance
+ * - Constraints de integridade
+ * - Estrutura de gamificação
+ * 
+ * ⛔ NÃO ALTERAR RELACIONAMENTOS
+ * ⛔ NÃO MODIFICAR ÍNDICES
+ * ⛔ NÃO ALTERAR CONSTRAINTS
+ * ⛔ NÃO MODIFICAR ESTRUTURA DE GAMIFICAÇÃO
+ * 
+ * 📅 Última atualização: Sistema funcional e validado
+ * 🔐 Status: ✅ PROTEGIDO - FUNCIONANDO PERFEITAMENTE
+ */
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model achievement {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String
+  icon            String
+  condition       String
+  xpReward        Int               @default(0)
+  userachievement userachievement[]
+}
+
+model analytics {
+  id       Int      @id @default(autoincrement())
+  metric   String
+  value    Float
+  date     DateTime
+  metadata String?
+  userId   Int?
+  user     user?    @relation(fields: [userId], references: [id], map: "Analytics_userId_fkey")
+
+  @@index([userId], map: "Analytics_userId_fkey")
+}
+
+model badge {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  icon        String
+  category    String
+  userbadge   userbadge[]
+}
+
+model challenge {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  type          String
+  xpReward      Int
+  startDate     DateTime
+  endDate       DateTime
+  conditions    String
+  userchallenge userchallenge[]
+}
+
+model leaderboard {
+  id               Int                @id @default(autoincrement())
+  name             String
+  type             String
+  startDate        DateTime
+  endDate          DateTime
+  leaderboardentry leaderboardentry[]
+}
+
+model leaderboardentry {
+  id            Int         @id @default(autoincrement())
+  leaderboardId Int
+  userId        Int
+  score         Int
+  rank          Int?
+  leaderboard   leaderboard @relation(fields: [leaderboardId], references: [id], map: "LeaderboardEntry_leaderboardId_fkey")
+  user          user        @relation(fields: [userId], references: [id], map: "LeaderboardEntry_userId_fkey")
+
+  @@index([leaderboardId], map: "LeaderboardEntry_leaderboardId_fkey")
+  @@index([userId], map: "LeaderboardEntry_userId_fkey")
+}
+
+model level {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique(map: "Level_name_key")
+  totalXp Int?
+  topic   topic[]
+}
+
+model mentor {
+  id         Int          @id @default(autoincrement())
+  userId     Int          @unique(map: "Mentor_userId_key")
+  expertise  String
+  bio        String?
+  rating     Float        @default(0)
+  mentorship mentorship[]
+}
+
+model mentorship {
+  id        Int       @id @default(autoincrement())
+  mentorId  Int
+  menteeId  Int
+  status    String
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  user      user      @relation(fields: [menteeId], references: [id], map: "Mentorship_menteeId_fkey")
+  mentor    mentor    @relation(fields: [mentorId], references: [id], map: "Mentorship_mentorId_fkey")
+
+  @@index([menteeId], map: "Mentorship_menteeId_fkey")
+  @@index([mentorId], map: "Mentorship_mentorId_fkey")
+}
+
+model notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], map: "Notification_userId_fkey")
+
+  @@index([userId], map: "Notification_userId_fkey")
+}
+
+model powerup {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  effect      String
+  duration    Int
+  cost        Int
+}
+
+model progress {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  topicId     Int
+  completed   Boolean   @default(false)
+  attempts    Int       @default(0)
+  completedAt DateTime?
+  difficulty  String?
+  startedAt   DateTime?
+  timeSpent   Int?
+  topic       topic     @relation(fields: [topicId], references: [id], map: "Progress_topicId_fkey")
+  user        user      @relation(fields: [userId], references: [id], map: "Progress_userId_fkey")
+
+  @@unique([userId, topicId], map: "Progress_userId_topicId_key")
+  @@index([topicId], map: "Progress_topicId_fkey")
+}
+
+model topic {
+  id       Int        @id @default(autoincrement())
+  name     String
+  xp       Int
+  levelId  Int
+  progress progress[]
+  level    level      @relation(fields: [levelId], references: [id], map: "Topic_levelId_fkey")
+
+  @@index([levelId], map: "Topic_levelId_fkey")
+}
+
+model user {
+  id               Int                @id @default(autoincrement())
+  email            String             @unique(map: "User_email_key")
+  password         String
+  createdAt        DateTime           @default(now())
+  currentStreak    Int                @default(0)
+  lastActivityDate DateTime?
+  longestStreak    Int                @default(0)
+  analytics        analytics[]
+  leaderboardentry leaderboardentry[]
+  mentorship       mentorship[]
+  notification     notification[]
+  progress         progress[]
+  userachievement  userachievement[]
+  userbadge        userbadge[]
+  userchallenge    userchallenge[]
+  usercurrency     usercurrency?
+}
+
+model userachievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  earnedAt      DateTime    @default(now())
+  achievement   achievement @relation(fields: [achievementId], references: [id], map: "UserAchievement_achievementId_fkey")
+  user          user        @relation(fields: [userId], references: [id], map: "UserAchievement_userId_fkey")
+
+  @@unique([userId, achievementId], map: "UserAchievement_userId_achievementId_key")
+  @@index([achievementId], map: "UserAchievement_achievementId_fkey")
+  @@index([userId], map: "UserAchievement_userId_fkey")
+}
+
+model userbadge {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  badgeId  Int
+  earnedAt DateTime @default(now())
+  badge    badge    @relation(fields: [badgeId], references: [id], map: "UserBadge_badgeId_fkey")
+  user     user     @relation(fields: [userId], references: [id], map: "UserBadge_userId_fkey")
+
+  @@unique([userId, badgeId], map: "UserBadge_userId_badgeId_key")
+  @@index([badgeId], map: "UserBadge_badgeId_fkey")
+  @@index([userId], map: "UserBadge_userId_fkey")
+}
+
+model userchallenge {
+  id          Int       @id @default(autoincrement())
+  challengeId Int
+  userId      Int
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  challenge   challenge @relation(fields: [challengeId], references: [id], map: "UserChallenge_challengeId_fkey")
+  user        user      @relation(fields: [userId], references: [id], map: "UserChallenge_userId_fkey")
+
+  @@index([challengeId], map: "UserChallenge_challengeId_fkey")
+  @@index([userId], map: "UserChallenge_userId_fkey")
+}
+
+model usercurrency {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique(map: "UserCurrency_userId_key")
+  coins  Int  @default(0)
+  gems   Int  @default(0)
+  user   user @relation(fields: [userId], references: [id], map: "UserCurrency_userId_fkey")
+}
