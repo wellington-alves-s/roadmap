@@ -1,0 +1,33 @@
+# 🔧 Variáveis de Ambiente para EasyPanel - Roadmap App
+# 
+# 📋 INSTRUÇÕES:
+# 1. Copie este arquivo para easypanel-env-vars.txt
+# 2. Preencha com suas credenciais reais
+# 3. NÃO commite o arquivo easypanel-env-vars.txt no GitHub!
+# 4. Use apenas no EasyPanel diretamente
+
+# ============================================
+# VARIÁVEIS OBRIGATÓRIAS
+# ============================================
+
+# Conexão com Banco de Dados MySQL
+# Formato: mysql://[usuario]:[senha]@[hostname]:3306/[banco]
+DATABASE_URL=mysql://[USUARIO]:[SENHA]@[HOSTNAME]:3306/[BANCO]
+
+# Chave Secreta JWT (para autenticação)
+# Gere uma chave aleatória forte (mínimo 32 caracteres)
+JWT_SECRET=[SUA_CHAVE_SECRETA_JWT_AQUI]
+
+# Ambiente de Execução
+NODE_ENV=production
+
+# Porta da Aplicação
+PORT=3003
+
+# ============================================
+# VARIÁVEIS OPCIONAIS (mas recomendadas)
+# ============================================
+
+# Tempo de expiração do token JWT (opcional)
+JWT_EXPIRES_IN=7d
+

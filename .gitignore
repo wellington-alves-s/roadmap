@@ -48,6 +48,9 @@ docs/sensitive/
 *_SENSITIVE.md
 credentials.md
 secrets.md
+easypanel-env-vars.txt
+*.env.local
+*.env.production
 
 # temp directory
 .temp

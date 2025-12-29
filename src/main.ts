@@ -1,12 +1,54 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ValidationPipe, VersioningType } from "@nestjs/common";
+import { ValidationPipe, VersioningType, Logger } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
 import { existsSync } from "fs";
 
+/**
+ * Valida variáveis de ambiente obrigatórias
+ */
+function validateEnvironmentVariables() {
+	const logger = new Logger("EnvironmentValidator");
+	const requiredVars = ["DATABASE_URL", "JWT_SECRET"];
+	const missingVars: string[] = [];
+
+	for (const varName of requiredVars) {
+		if (!process.env[varName]) {
+			missingVars.push(varName);
+		}
+	}
+
+	if (missingVars.length > 0) {
+		logger.error("❌ Variáveis de ambiente obrigatórias não encontradas:");
+		missingVars.forEach((varName) => {
+			logger.error(`   - ${varName}`);
+		});
+		logger.error("");
+		logger.error("📋 Para configurar no EasyPanel:");
+		logger.error("   1. Acesse o painel do EasyPanel");
+		logger.error("   2. Vá para o serviço da aplicação");
+		logger.error("   3. Clique na aba 'Environment'");
+		logger.error("   4. Adicione as seguintes variáveis:");
+		logger.error("");
+		logger.error("   DATABASE_URL=mysql://[usuario]:[senha]@[hostname]:3306/[banco]");
+		logger.error("   JWT_SECRET=[sua-chave-secreta-jwt]");
+		logger.error("");
+		logger.error("📚 Consulte a documentação em: docs/EASYPANEL_DATABASE_CONNECTION_FIX.md");
+		logger.error("");
+		throw new Error(
+			`Variáveis de ambiente obrigatórias não encontradas: ${missingVars.join(", ")}`,
+		);
+	}
+
+	logger.log("✅ Todas as variáveis de ambiente obrigatórias estão configuradas");
+}
+
 async function bootstrap() {
+	// Validar variáveis de ambiente antes de iniciar
+	validateEnvironmentVariables();
+
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 	// Configurar CORS
