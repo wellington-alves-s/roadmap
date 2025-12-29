@@ -8,6 +8,7 @@ import {
 	Delete,
 	UseGuards,
 	Version,
+	Query,
 } from "@nestjs/common";
 import { LevelsService } from "./levels.service";
 import { CreateLevelDto } from "./dto/create-level.dto";
@@ -31,8 +32,9 @@ export class LevelsController {
 
 	@Get()
 	@Version("1")
-	findAll() {
-		return this.levelsService.findAll();
+	findAll(@Query("roadmapId") roadmapId?: string) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.levelsService.findAll(roadmapIdNum);
 	}
 
 	@Get(":id")

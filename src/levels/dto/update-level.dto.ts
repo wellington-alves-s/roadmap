@@ -9,4 +9,8 @@ export class UpdateLevelDto {
 	@IsNumber()
 	@Min(0)
 	totalXp?: number;
+
+	@IsOptional()
+	@IsNumber()
+	roadmapId?: number;
 }

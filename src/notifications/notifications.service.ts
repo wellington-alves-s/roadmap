@@ -33,9 +33,14 @@ export class NotificationsService {
 		});
 	}
 
-	async findByUser(userId: number) {
+	async findByUser(userId: number, roadmapId?: number) {
+		const where: any = { userId };
+		if (roadmapId) {
+			where.roadmapId = roadmapId;
+		}
+
 		return this.prisma.notification.findMany({
-			where: { userId },
+			where,
 			orderBy: {
 				createdAt: "desc",
 			},
@@ -106,31 +111,50 @@ export class NotificationsService {
 		});
 	}
 
-	async markAllAsRead(userId: number) {
+	async markAllAsRead(userId: number, roadmapId?: number) {
+		const where: any = { userId, read: false };
+		if (roadmapId) {
+			where.roadmapId = roadmapId;
+		}
+
 		return this.prisma.notification.updateMany({
-			where: { userId, read: false },
+			where,
 			data: { read: true },
 		});
 	}
 
-	async clearAllByUser(userId: number) {
-		this.logger.log(`Clearing all notifications for user ${userId}`);
-		
+	async clearAllByUser(userId: number, roadmapId?: number) {
+		this.logger.log(
+			`Clearing all notifications for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+		);
+
+		const where: any = { userId };
+		if (roadmapId) {
+			where.roadmapId = roadmapId;
+		}
+
 		const deletedNotifications = await this.prisma.notification.deleteMany({
-			where: { userId },
+			where,
 		});
 
-		this.logger.log(`Deleted ${deletedNotifications.count} notifications for user ${userId}`);
-		
+		this.logger.log(
+			`Deleted ${deletedNotifications.count} notifications for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+		);
+
 		return {
 			message: `${deletedNotifications.count} notificações removidas com sucesso`,
 			deletedCount: deletedNotifications.count,
 		};
 	}
 
-	async getUnreadCount(userId: number) {
+	async getUnreadCount(userId: number, roadmapId?: number) {
+		const where: any = { userId, read: false };
+		if (roadmapId) {
+			where.roadmapId = roadmapId;
+		}
+
 		return this.prisma.notification.count({
-			where: { userId, read: false },
+			where,
 		});
 	}
 
@@ -139,8 +163,11 @@ export class NotificationsService {
 		title: string,
 		message: string,
 		type: string = "system",
+		roadmapId?: number,
 	) {
-		this.logger.log(`Creating system notification for user ${userId}`);
+		this.logger.log(
+			`Creating system notification for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+		);
 
 		return this.prisma.notification.create({
 			data: {
@@ -148,6 +175,7 @@ export class NotificationsService {
 				title,
 				message,
 				type,
+				roadmapId: roadmapId || undefined,
 			},
 		});
 	}

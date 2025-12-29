@@ -9,4 +9,8 @@ export class CreateLevelDto {
 	@IsNumber()
 	@Min(0)
 	totalXp?: number;
+
+	@IsNotEmpty()
+	@IsNumber()
+	roadmapId: number;
 }

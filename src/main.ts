@@ -10,8 +10,14 @@ async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 	// Configurar CORS
+	const allowedOrigins = process.env.CORS_ORIGINS
+		? process.env.CORS_ORIGINS.split(",")
+		: process.env.NODE_ENV === "production"
+			? true // Em produção, aceitar todas as origens (ou configure domínios específicos)
+			: ["http://localhost:3003", "http://127.0.0.1:3003", "http://localhost:8080", "http://127.0.0.1:8080", "file://"];
+
 	app.enableCors({
-		origin: ["http://localhost:3003", "http://127.0.0.1:3003", "http://localhost:8080", "http://127.0.0.1:8080", "file://"],
+		origin: allowedOrigins,
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
@@ -33,6 +39,12 @@ async function bootstrap() {
 	// Configurar pasta de arquivos estáticos
 	app.useStaticAssets(publicDir, {
 		index: false, // Desabilita o index automático para podermos controlar
+	});
+
+	// Configurar pasta de uploads para servir arquivos enviados
+	const uploadsDir = join(process.cwd(), "uploads");
+	app.useStaticAssets(uploadsDir, {
+		prefix: "/uploads/",
 	});
 
 	// Middleware para servir o frontend na raiz

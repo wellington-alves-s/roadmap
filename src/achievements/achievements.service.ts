@@ -5,8 +5,8 @@ import { UpdateAchievementDto } from "./dto/update-achievement.dto";
 
 @Injectable()
 export class AchievementsService {
-	private readonly logger = new Logger(AchievementsService.name)
-	private readonly processingUsers = new Set<number>() // Mutex para usuários em processamento;
+	private readonly logger = new Logger(AchievementsService.name);
+	private readonly processingUsers = new Set<number>(); // Mutex para usuários em processamento;
 
 	constructor(private prisma: PrismaService) {}
 
@@ -83,8 +83,8 @@ export class AchievementsService {
 		});
 	}
 
-	async checkAndAwardAchievements(userId: number) {
-		this.logger.log(`🔍 Checking achievements for user ${userId}`);
+	async checkAndAwardAchievements(userId: number, roadmapId: number) {
+		this.logger.log(`🔍 Checking achievements for user ${userId} in roadmap ${roadmapId}`);
 
 		// Verificar se já está processando este usuário
 		if (this.processingUsers.has(userId)) {
@@ -96,378 +96,445 @@ export class AchievementsService {
 		this.processingUsers.add(userId);
 
 		try {
-
-		const user = await this.prisma.user.findUnique({
-			where: { id: userId },
-			include: {
-				progress: {
-					include: {
-						topic: true,
+			const user = await this.prisma.user.findUnique({
+				where: { id: userId },
+				include: {
+					progress: {
+						include: {
+							topic: {
+								include: {
+									level: true,
+								},
+							},
+						},
+					},
+					userachievement: {
+						include: {
+							achievement: true,
+						},
 					},
 				},
-				userachievement: {
-					include: {
-						achievement: true,
-					},
-				},
-			},
-		});
+			});
 
-		if (!user) {
-			throw new NotFoundException("Usuário não encontrado");
-		}
-
-		const completedTopics = user.progress.filter((p) => p.completed).length;
-		const totalXp = user.progress
-			.filter((p) => p.completed)
-			.reduce((sum, p) => sum + p.topic.xp, 0);
-
-		this.logger.log(`📊 User stats:`);
-		this.logger.log(`  - Completed topics: ${completedTopics}`);
-		this.logger.log(`  - Total XP: ${totalXp}`);
-		this.logger.log(`  - Current streak: ${user.currentStreak}`);
-
-		const allAchievements = await this.prisma.achievement.findMany();
-		this.logger.log(`📋 Total achievements available: ${allAchievements.length}`);
-
-		const awardedAchievements = user.userachievement.map((ua) => ua.achievementId);
-		this.logger.log(`🏆 Already awarded: ${awardedAchievements.length} achievements`);
-
-		const newAchievements: any[] = [];
-
-		for (const achievement of allAchievements) {
-			this.logger.log(`🔍 Checking achievement: ${achievement.name}`);
-
-			if (awardedAchievements.includes(achievement.id)) {
-				this.logger.log(`  ⏭️ Already has this achievement, skipping`);
-				continue; // Já conquistou
+			if (!user) {
+				throw new NotFoundException("Usuário não encontrado");
 			}
 
-			const conditions = JSON.parse(achievement.condition);
-			this.logger.log(`  📋 Conditions: ${JSON.stringify(conditions)}`);
-			let shouldAward = true;
+			// Filtrar progresso apenas do roadmap atual
+			const roadmapProgress = user.progress.filter(
+				(p) => p.topic.level.roadmapId === roadmapId,
+			);
+			const completedTopics = roadmapProgress.filter((p) => p.completed).length;
+			const totalXp = roadmapProgress
+				.filter((p) => p.completed)
+				.reduce((sum, p) => sum + p.topic.xp, 0);
 
-			// Verificar condições
-			for (const condition of conditions) {
-				this.logger.log(`  🔍 Checking condition: ${condition.type} >= ${condition.value}`);
-				
-				switch (condition.type) {
-					case "topics_completed":
-						this.logger.log(`    📊 User has ${completedTopics} completed topics, needs >= ${condition.value}`);
-						if (completedTopics < condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough topics completed`);
-						} else {
-							this.logger.log(`    ✅ Topics requirement met`);
-						}
-						break;
-					
-					case "topics_completed_exactly":
-						this.logger.log(`    📊 User has ${completedTopics} completed topics, needs exactly ${condition.value}`);
-						if (completedTopics !== condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Exact topics requirement not met`);
-						} else {
-							this.logger.log(`    ✅ Exact topics requirement met`);
-						}
-						break;
-					
-					case "level_completed":
-						const levelId = condition.value;
-						const levelTopics = await this.prisma.topic.findMany({
-							where: { levelId },
-						});
-						const completedTopicsInLevel = user.progress.filter(
-							(progress) => progress.completed && levelTopics.some((topic) => topic.id === progress.topicId)
-						).length;
-						
-						this.logger.log(`    📊 Level ${levelId}: ${completedTopicsInLevel}/${levelTopics.length} topics completed`);
-						
-						if (completedTopicsInLevel < levelTopics.length) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Level ${levelId} not completed`);
-						} else {
-							this.logger.log(`    ✅ Level ${levelId} completed`);
-						}
-						break;
-					
-					case "specific_levels_completed":
-						const requiredLevels = condition.value;
-						let allLevelsCompleted = true;
-						
-						for (const levelId of requiredLevels) {
-							const levelTopics = await this.prisma.topic.findMany({
-								where: { levelId },
-							});
-							const completedTopicsInLevel = user.progress.filter(
-								(progress) => progress.completed && levelTopics.some((topic) => topic.id === progress.topicId)
-							).length;
-							
-							if (completedTopicsInLevel < levelTopics.length) {
-								allLevelsCompleted = false;
-								this.logger.log(`    ❌ Level ${levelId} not completed (${completedTopicsInLevel}/${levelTopics.length})`);
-								break;
+			this.logger.log(`📊 User stats (roadmap ${roadmapId}):`);
+			this.logger.log(`  - Completed topics: ${completedTopics}`);
+			this.logger.log(`  - Total XP: ${totalXp}`);
+			this.logger.log(`  - Current streak: ${user.currentStreak}`);
+
+			// Buscar achievements apenas do roadmap atual
+			const allAchievements = await this.prisma.achievement.findMany({
+				where: { roadmapId },
+			});
+			this.logger.log(
+				`📋 Total achievements available for roadmap ${roadmapId}: ${allAchievements.length}`,
+			);
+
+			// Filtrar achievements já conquistados neste roadmap
+			const awardedAchievements = user.userachievement
+				.filter((ua) => ua.roadmapId === roadmapId)
+				.map((ua) => ua.achievementId);
+			this.logger.log(
+				`🏆 Already awarded in this roadmap: ${awardedAchievements.length} achievements`,
+			);
+
+			const newAchievements: any[] = [];
+
+			for (const achievement of allAchievements) {
+				this.logger.log(`🔍 Checking achievement: ${achievement.name}`);
+
+				if (awardedAchievements.includes(achievement.id)) {
+					this.logger.log(`  ⏭️ Already has this achievement, skipping`);
+					continue; // Já conquistou
+				}
+
+				const conditions = JSON.parse(achievement.condition);
+				this.logger.log(`  📋 Conditions: ${JSON.stringify(conditions)}`);
+				let shouldAward = true;
+
+				// Verificar condições (usando apenas progresso do roadmap atual)
+				for (const condition of conditions) {
+					this.logger.log(
+						`  🔍 Checking condition: ${condition.type} >= ${condition.value}`,
+					);
+
+					switch (condition.type) {
+						case "topics_completed":
+							this.logger.log(
+								`    📊 User has ${completedTopics} completed topics, needs >= ${condition.value}`,
+							);
+							if (completedTopics < condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough topics completed`);
+							} else {
+								this.logger.log(`    ✅ Topics requirement met`);
 							}
-						}
-						
-						if (!allLevelsCompleted) {
-							shouldAward = false;
-						} else {
-							this.logger.log(`    ✅ All required levels completed`);
-						}
-						break;
-					
-					case "streak_days":
-						this.logger.log(`    📊 User has ${user.currentStreak} streak days, needs ${condition.value}`);
-						if (user.currentStreak < condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough streak days`);
-						} else {
-							this.logger.log(`    ✅ Streak requirement met`);
-						}
-						break;
-					
-					case "total_xp":
-						this.logger.log(`    📊 User has ${totalXp} XP, needs ${condition.value}`);
-						if (totalXp < condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough XP`);
-						} else {
-							this.logger.log(`    ✅ XP requirement met`);
-						}
-						break;
-					
-					case "levels_completed_exactly":
-						// Contar quantos níveis foram completamente concluídos
-						const allLevels = await this.prisma.level.findMany({
-							include: { topic: true }
-						});
-						
-						let completedLevelsCount = 0;
-						for (const level of allLevels) {
-							const levelTopics = level.topic || [];
-							if (levelTopics.length > 0) {
-								const completedTopicsInLevel = user.progress.filter(
-									(progress) => progress.completed && 
-									levelTopics.some((topic) => topic.id === progress.topicId)
+							break;
+
+						case "topics_completed_exactly":
+							this.logger.log(
+								`    📊 User has ${completedTopics} completed topics, needs exactly ${condition.value}`,
+							);
+							if (completedTopics !== condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Exact topics requirement not met`);
+							} else {
+								this.logger.log(`    ✅ Exact topics requirement met`);
+							}
+							break;
+
+						case "level_completed":
+							const levelId = condition.value;
+							const levelTopics = await this.prisma.topic.findMany({
+								where: { levelId, level: { roadmapId } },
+							});
+							const completedTopicsInLevel = roadmapProgress.filter(
+								(progress) =>
+									progress.completed &&
+									levelTopics.some((topic) => topic.id === progress.topicId),
+							).length;
+
+							this.logger.log(
+								`    📊 Level ${levelId}: ${completedTopicsInLevel}/${levelTopics.length} topics completed`,
+							);
+
+							if (completedTopicsInLevel < levelTopics.length) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Level ${levelId} not completed`);
+							} else {
+								this.logger.log(`    ✅ Level ${levelId} completed`);
+							}
+							break;
+
+						case "specific_levels_completed":
+							const requiredLevels = condition.value;
+							let allLevelsCompleted = true;
+
+							for (const levelId of requiredLevels) {
+								const levelTopics = await this.prisma.topic.findMany({
+									where: { levelId, level: { roadmapId } },
+								});
+								const completedTopicsInLevel = roadmapProgress.filter(
+									(progress) =>
+										progress.completed &&
+										levelTopics.some((topic) => topic.id === progress.topicId),
 								).length;
-								
-								if (completedTopicsInLevel === levelTopics.length) {
-									completedLevelsCount++;
+
+								if (completedTopicsInLevel < levelTopics.length) {
+									allLevelsCompleted = false;
+									this.logger.log(
+										`    ❌ Level ${levelId} not completed (${completedTopicsInLevel}/${levelTopics.length})`,
+									);
+									break;
 								}
 							}
-						}
-						
-						this.logger.log(`    📊 User has ${completedLevelsCount} completed levels, needs exactly ${condition.value}`);
-						if (completedLevelsCount !== condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Levels completed count doesn't match exactly`);
-						} else {
-							this.logger.log(`    ✅ Exact levels completed requirement met`);
-						}
-						break;
-					
-					case "levels_touched":
-						// Contar em quantos níveis diferentes o usuário completou pelo menos 1 tópico
-						const userTopicIds = user.progress
-							.filter(p => p.completed)
-							.map(p => p.topicId);
-						
-						const levelsWithCompletedTopics = await this.prisma.level.findMany({
-							include: {
-								topic: {
-									where: {
-										id: { in: userTopicIds }
+
+							if (!allLevelsCompleted) {
+								shouldAward = false;
+							} else {
+								this.logger.log(`    ✅ All required levels completed`);
+							}
+							break;
+
+						case "streak_days":
+							this.logger.log(
+								`    📊 User has ${user.currentStreak} streak days, needs ${condition.value}`,
+							);
+							if (user.currentStreak < condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough streak days`);
+							} else {
+								this.logger.log(`    ✅ Streak requirement met`);
+							}
+							break;
+
+						case "total_xp":
+							this.logger.log(
+								`    📊 User has ${totalXp} XP, needs ${condition.value}`,
+							);
+							if (totalXp < condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough XP`);
+							} else {
+								this.logger.log(`    ✅ XP requirement met`);
+							}
+							break;
+
+						case "levels_completed_exactly":
+							// Contar quantos níveis foram completamente concluídos (apenas do roadmap atual)
+							const allLevels = await this.prisma.level.findMany({
+								where: { roadmapId },
+								include: { topic: true },
+							});
+
+							let completedLevelsCount = 0;
+							for (const level of allLevels) {
+								const levelTopics = level.topic || [];
+								if (levelTopics.length > 0) {
+									const completedTopicsInLevel = roadmapProgress.filter(
+										(progress) =>
+											progress.completed &&
+											levelTopics.some(
+												(topic) => topic.id === progress.topicId,
+											),
+									).length;
+
+									if (completedTopicsInLevel === levelTopics.length) {
+										completedLevelsCount++;
 									}
 								}
 							}
-						});
-						
-						const touchedLevelsCount = levelsWithCompletedTopics.filter(
-							level => level.topic.length > 0
-						).length;
-						
-						this.logger.log(`    📊 User touched ${touchedLevelsCount} different levels, needs ${condition.value}`);
-						if (touchedLevelsCount < condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough levels touched`);
-						} else {
-							this.logger.log(`    ✅ Levels touched requirement met`);
-						}
-						break;
-					
-					case "topics_per_day":
-						// Esta verificação seria mais complexa e requereria dados de timestamp
-						// Por enquanto, vamos implementar uma versão simplificada
-						// que verifica se o usuário completou X tópicos hoje
-						const today = new Date();
-						today.setHours(0, 0, 0, 0);
-						const tomorrow = new Date(today);
-						tomorrow.setDate(tomorrow.getDate() + 1);
-						
-						const todayCompletedTopics = user.progress.filter(progress => {
-							if (!progress.completed || !progress.completedAt) return false;
-							const completedDate = new Date(progress.completedAt);
-							return completedDate >= today && completedDate < tomorrow;
-						}).length;
-						
-						this.logger.log(`    📊 User completed ${todayCompletedTopics} topics today, needs ${condition.value}`);
-						if (todayCompletedTopics < condition.value) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough topics completed today`);
-						} else {
-							this.logger.log(`    ✅ Topics per day requirement met`);
-						}
-						break;
-					
-					case "early_bird":
-						// Verificar se completou um tópico antes do horário especificado
-						const earlyHour = condition.value; // Hora limite (ex: 8)
-						const earlyBirdProgress = user.progress.filter(progress => {
-							if (!progress.completed || !progress.completedAt) return false;
-							const completedDate = new Date(progress.completedAt);
-							const completedHour = completedDate.getHours();
-							return completedHour < earlyHour;
-						});
-						
-						this.logger.log(`    📊 Found ${earlyBirdProgress.length} topics completed before ${earlyHour}h`);
-						if (earlyBirdProgress.length === 0) {
-							shouldAward = false;
-							this.logger.log(`    ❌ No topics completed before ${earlyHour}h`);
-						} else {
-							this.logger.log(`    ✅ Early bird requirement met`);
-						}
-						break;
-					
-					case "night_owl":
-						// Verificar se completou um tópico depois do horário especificado
-						const nightHour = condition.value; // Hora limite (ex: 22)
-						const nightOwlProgress = user.progress.filter(progress => {
-							if (!progress.completed || !progress.completedAt) return false;
-							const completedDate = new Date(progress.completedAt);
-							const completedHour = completedDate.getHours();
-							return completedHour >= nightHour;
-						});
-						
-						this.logger.log(`    📊 Found ${nightOwlProgress.length} topics completed after ${nightHour}h`);
-						if (nightOwlProgress.length === 0) {
-							shouldAward = false;
-							this.logger.log(`    ❌ No topics completed after ${nightHour}h`);
-						} else {
-							this.logger.log(`    ✅ Night owl requirement met`);
-						}
-						break;
-					
-					case "weekend_warrior":
-						// Verificar se completou X tópicos no fim de semana (sábado=6, domingo=0)
-						const requiredWeekendTopics = condition.value;
-						const weekendProgress = user.progress.filter(progress => {
-							if (!progress.completed || !progress.completedAt) return false;
-							const completedDate = new Date(progress.completedAt);
-							const dayOfWeek = completedDate.getDay(); // 0=domingo, 6=sábado
-							return dayOfWeek === 0 || dayOfWeek === 6;
-						});
-						
-						this.logger.log(`    📊 Found ${weekendProgress.length} topics completed on weekends, needs ${requiredWeekendTopics}`);
-						if (weekendProgress.length < requiredWeekendTopics) {
-							shouldAward = false;
-							this.logger.log(`    ❌ Not enough weekend topics completed`);
-						} else {
-							this.logger.log(`    ✅ Weekend warrior requirement met`);
-						}
-						break;
-					
-					default:
-						this.logger.warn(`  ⚠️ Unknown condition type: ${condition.type}`);
-						shouldAward = false;
-						break;
-				}
-			}
 
-			this.logger.log(`  📊 Should award: ${shouldAward}`);
+							this.logger.log(
+								`    📊 User has ${completedLevelsCount} completed levels, needs exactly ${condition.value}`,
+							);
+							if (completedLevelsCount !== condition.value) {
+								shouldAward = false;
+								this.logger.log(
+									`    ❌ Levels completed count doesn't match exactly`,
+								);
+							} else {
+								this.logger.log(`    ✅ Exact levels completed requirement met`);
+							}
+							break;
 
-			if (shouldAward) {
-				this.logger.log(`  🎉 Awarding achievement: ${achievement.name}`);
-				
-				try {
-					// Usar createMany com skipDuplicates para máxima proteção
-					const result = await this.prisma.$transaction(async (tx) => {
-						// Primeiro verificar se já existe
-						const existing = await tx.userachievement.findFirst({
-							where: {
-								userId,
-								achievementId: achievement.id,
-							},
-						});
+						case "levels_touched":
+							// Contar em quantos níveis diferentes o usuário completou pelo menos 1 tópico (apenas do roadmap atual)
+							const userTopicIds = roadmapProgress
+								.filter((p) => p.completed)
+								.map((p) => p.topicId);
 
-						if (existing) {
-							this.logger.log(`  ⚠️ Achievement ${achievement.id} already exists for user ${userId}, skipping`);
-							return null;
-						}
-
-						// Tentar criar usando createMany com skipDuplicates
-						try {
-							const createResult = await tx.userachievement.createMany({
-								data: [{
-									userId,
-									achievementId: achievement.id,
-								}],
-								skipDuplicates: true,
+							const levelsWithCompletedTopics = await this.prisma.level.findMany({
+								where: { roadmapId },
+								include: {
+									topic: {
+										where: {
+											id: { in: userTopicIds },
+										},
+									},
+								},
 							});
 
-							if (createResult.count > 0) {
-								this.logger.log(`  ✅ New achievement created for user ${userId}: ${achievement.name}`);
-								
-								// Buscar a conquista recém-criada
-								const newAchievement = await tx.userachievement.findFirst({
-									where: {
-										userId,
-										achievementId: achievement.id,
-									},
-									orderBy: {
-										id: 'desc',
-									},
-								});
-								
-								// Criar notificação
-								await tx.notification.create({
-									data: {
-										userId,
-										title: "Nova Conquista!",
-										message: `Você conquistou: ${achievement.name}`,
-										type: "achievement",
-									},
-								});
-								
-								return newAchievement;
+							const touchedLevelsCount = levelsWithCompletedTopics.filter(
+								(level) => level.topic.length > 0,
+							).length;
+
+							this.logger.log(
+								`    📊 User touched ${touchedLevelsCount} different levels, needs ${condition.value}`,
+							);
+							if (touchedLevelsCount < condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough levels touched`);
 							} else {
-								this.logger.log(`  ⚠️ Achievement ${achievement.id} skipped due to duplicate for user ${userId}`);
+								this.logger.log(`    ✅ Levels touched requirement met`);
+							}
+							break;
+
+						case "topics_per_day":
+							// Esta verificação seria mais complexa e requereria dados de timestamp
+							// Por enquanto, vamos implementar uma versão simplificada
+							// que verifica se o usuário completou X tópicos hoje (apenas do roadmap atual)
+							const today = new Date();
+							today.setHours(0, 0, 0, 0);
+							const tomorrow = new Date(today);
+							tomorrow.setDate(tomorrow.getDate() + 1);
+
+							const todayCompletedTopics = roadmapProgress.filter((progress) => {
+								if (!progress.completed || !progress.completedAt) return false;
+								const completedDate = new Date(progress.completedAt);
+								return completedDate >= today && completedDate < tomorrow;
+							}).length;
+
+							this.logger.log(
+								`    📊 User completed ${todayCompletedTopics} topics today, needs ${condition.value}`,
+							);
+							if (todayCompletedTopics < condition.value) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough topics completed today`);
+							} else {
+								this.logger.log(`    ✅ Topics per day requirement met`);
+							}
+							break;
+
+						case "early_bird":
+							// Verificar se completou um tópico antes do horário especificado (apenas do roadmap atual)
+							const earlyHour = condition.value; // Hora limite (ex: 8)
+							const earlyBirdProgress = roadmapProgress.filter((progress) => {
+								if (!progress.completed || !progress.completedAt) return false;
+								const completedDate = new Date(progress.completedAt);
+								const completedHour = completedDate.getHours();
+								return completedHour < earlyHour;
+							});
+
+							this.logger.log(
+								`    📊 Found ${earlyBirdProgress.length} topics completed before ${earlyHour}h`,
+							);
+							if (earlyBirdProgress.length === 0) {
+								shouldAward = false;
+								this.logger.log(`    ❌ No topics completed before ${earlyHour}h`);
+							} else {
+								this.logger.log(`    ✅ Early bird requirement met`);
+							}
+							break;
+
+						case "night_owl":
+							// Verificar se completou um tópico depois do horário especificado (apenas do roadmap atual)
+							const nightHour = condition.value; // Hora limite (ex: 22)
+							const nightOwlProgress = roadmapProgress.filter((progress) => {
+								if (!progress.completed || !progress.completedAt) return false;
+								const completedDate = new Date(progress.completedAt);
+								const completedHour = completedDate.getHours();
+								return completedHour >= nightHour;
+							});
+
+							this.logger.log(
+								`    📊 Found ${nightOwlProgress.length} topics completed after ${nightHour}h`,
+							);
+							if (nightOwlProgress.length === 0) {
+								shouldAward = false;
+								this.logger.log(`    ❌ No topics completed after ${nightHour}h`);
+							} else {
+								this.logger.log(`    ✅ Night owl requirement met`);
+							}
+							break;
+
+						case "weekend_warrior":
+							// Verificar se completou X tópicos no fim de semana (sábado=6, domingo=0) - apenas do roadmap atual
+							const requiredWeekendTopics = condition.value;
+							const weekendProgress = roadmapProgress.filter((progress) => {
+								if (!progress.completed || !progress.completedAt) return false;
+								const completedDate = new Date(progress.completedAt);
+								const dayOfWeek = completedDate.getDay(); // 0=domingo, 6=sábado
+								return dayOfWeek === 0 || dayOfWeek === 6;
+							});
+
+							this.logger.log(
+								`    📊 Found ${weekendProgress.length} topics completed on weekends, needs ${requiredWeekendTopics}`,
+							);
+							if (weekendProgress.length < requiredWeekendTopics) {
+								shouldAward = false;
+								this.logger.log(`    ❌ Not enough weekend topics completed`);
+							} else {
+								this.logger.log(`    ✅ Weekend warrior requirement met`);
+							}
+							break;
+
+						default:
+							this.logger.warn(`  ⚠️ Unknown condition type: ${condition.type}`);
+							shouldAward = false;
+							break;
+					}
+				}
+
+				this.logger.log(`  📊 Should award: ${shouldAward}`);
+
+				if (shouldAward) {
+					this.logger.log(`  🎉 Awarding achievement: ${achievement.name}`);
+
+					try {
+						// Usar createMany com skipDuplicates para máxima proteção
+						const result = await this.prisma.$transaction(async (tx) => {
+							// Primeiro verificar se já existe
+							const existing = await tx.userachievement.findFirst({
+								where: {
+									userId,
+									achievementId: achievement.id,
+								},
+							});
+
+							if (existing) {
+								this.logger.log(
+									`  ⚠️ Achievement ${achievement.id} already exists for user ${userId}, skipping`,
+								);
 								return null;
 							}
-						} catch (error) {
-							this.logger.error(`  ❌ Error creating achievement: ${error.message}`);
-							return null;
+
+							// Tentar criar usando createMany com skipDuplicates (incluindo roadmapId)
+							try {
+								const createResult = await tx.userachievement.createMany({
+									data: [
+										{
+											userId,
+											achievementId: achievement.id,
+											roadmapId,
+										},
+									],
+									skipDuplicates: true,
+								});
+
+								if (createResult.count > 0) {
+									this.logger.log(
+										`  ✅ New achievement created for user ${userId}: ${achievement.name}`,
+									);
+
+									// Buscar a conquista recém-criada
+									const newAchievement = await tx.userachievement.findFirst({
+										where: {
+											userId,
+											achievementId: achievement.id,
+										},
+										orderBy: {
+											id: "desc",
+										},
+									});
+
+									// Criar notificação (com roadmapId)
+									await tx.notification.create({
+										data: {
+											userId,
+											title: "Nova Conquista!",
+											message: `Você conquistou: ${achievement.name}`,
+											type: "achievement",
+											roadmapId,
+										},
+									});
+
+									return newAchievement;
+								} else {
+									this.logger.log(
+										`  ⚠️ Achievement ${achievement.id} skipped due to duplicate for user ${userId}`,
+									);
+									return null;
+								}
+							} catch (error) {
+								this.logger.error(
+									`  ❌ Error creating achievement: ${error.message}`,
+								);
+								return null;
+							}
+						});
+
+						if (result) {
+							this.logger.log(
+								`  ✅ UserAchievement created successfully for achievement ${achievement.id}`,
+							);
+							this.logger.log(`  ✅ Notification created successfully`);
+							newAchievements.push(achievement);
+							this.logger.log(`  ✅ Achievement awarded successfully`);
 						}
-					});
-
-					if (result) {
-						this.logger.log(`  ✅ UserAchievement created successfully for achievement ${achievement.id}`);
-						this.logger.log(`  ✅ Notification created successfully`);
-						newAchievements.push(achievement);
-						this.logger.log(`  ✅ Achievement awarded successfully`);
+					} catch (error) {
+						this.logger.error(`  ❌ Error saving achievement: ${error.message}`);
+						this.logger.error(`  📊 Error details:`, error);
 					}
-				} catch (error) {
-					this.logger.error(`  ❌ Error saving achievement: ${error.message}`);
-					this.logger.error(`  📊 Error details:`, error);
+				} else {
+					this.logger.log(`  ❌ Requirements not met for: ${achievement.name}`);
 				}
-			} else {
-				this.logger.log(`  ❌ Requirements not met for: ${achievement.name}`);
 			}
-		}
 
-		this.logger.log(`🎯 Total new achievements awarded: ${newAchievements.length}`);
-		return newAchievements;
-		
+			this.logger.log(`🎯 Total new achievements awarded: ${newAchievements.length}`);
+			return newAchievements;
 		} finally {
 			// Liberar o usuário do processamento
 			this.processingUsers.delete(userId);
@@ -485,10 +552,12 @@ export class AchievementsService {
 				const userAchievements = await tx.userachievement.findMany({
 					where: { userId },
 					include: { achievement: true },
-					orderBy: { id: 'asc' },
+					orderBy: { id: "asc" },
 				});
 
-				this.logger.log(`📋 Found ${userAchievements.length} achievements for user ${userId}`);
+				this.logger.log(
+					`📋 Found ${userAchievements.length} achievements for user ${userId}`,
+				);
 
 				// Identificar duplicatas (mesmo achievementId, manter o primeiro)
 				const seen = new Set<number>();
@@ -497,7 +566,9 @@ export class AchievementsService {
 				for (const ua of userAchievements) {
 					if (seen.has(ua.achievementId)) {
 						duplicates.push(ua.id);
-						this.logger.log(`🗑️ Duplicate found: ${ua.achievement.name} (ID: ${ua.id})`);
+						this.logger.log(
+							`🗑️ Duplicate found: ${ua.achievement.name} (ID: ${ua.id})`,
+						);
 					} else {
 						seen.add(ua.achievementId);
 					}
@@ -550,9 +621,14 @@ export class AchievementsService {
 		}
 	}
 
-	async getUserAchievements(userId: number) {
+	async getUserAchievements(userId: number, roadmapId?: number) {
+		const where: any = { userId };
+		if (roadmapId) {
+			where.roadmapId = roadmapId;
+		}
+
 		return this.prisma.userachievement.findMany({
-			where: { userId },
+			where,
 			include: {
 				achievement: true,
 			},

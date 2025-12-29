@@ -226,7 +226,7 @@ npm run start:dev
 #### **🐳 Deploy com Docker/EasyPanel (Recomendado)**
 ```bash
 # Configurar ambiente
-cp env.production.example .env
+cp env.example .env
 nano .env  # Editar configurações
 
 # Deploy automático
@@ -235,8 +235,9 @@ nano .env  # Editar configurações
 ```
 
 #### **📚 Documentação de Deploy**
+- **🚀 Deploy GitHub + Easypanel**: [`DEPLOY_GITHUB_EASYPANEL.md`](./DEPLOY_GITHUB_EASYPANEL.md) - **Guia completo passo a passo**
 - **Deploy Rápido**: [`DEPLOY_QUICKSTART.md`](../DEPLOY_QUICKSTART.md)
-- **Deploy Completo**: [`docs/EASYPANEL_DEPLOY_GUIDE.md`](./EASYPANEL_DEPLOY_GUIDE.md)
+- **Deploy Completo**: [`docs/EASYPANEL_DEPLOY_GUIDE.md`](./docs/EASYPANEL_DEPLOY_GUIDE.md)
 - **Configuração Avançada**: [`DEPLOY.md`](../DEPLOY.md)
 
 ### **3. Usuário de Teste**

@@ -40,6 +40,9 @@ Status: ✅ APROVADO PELO USUÁRIO
 		<link rel="manifest" href="/manifest.json" />
 
 		<link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="topic-modal.css" />
+        <link rel="stylesheet" href="admin-modal.css" />
+        <link rel="stylesheet" href="topic-click.css" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -196,6 +199,20 @@ Status: ✅ APROVADO PELO USUÁRIO
 				</div>
 
 				<nav class="sidebar-nav">
+					<!-- Roadmap Selector -->
+					<div class="roadmap-selector-container">
+						<label for="roadmapSelect" class="roadmap-selector-label">
+							<i class="fas fa-map"></i>
+							<span>Roadmap</span>
+						</label>
+						<select id="roadmapSelect" class="roadmap-selector">
+							<option value="">Carregando...</option>
+						</select>
+						<button id="createRoadmapBtn" class="create-roadmap-btn" title="Criar novo roadmap">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					
 					<button id="dashboardBtn" class="sidebar-btn active">
 						<i class="fas fa-home"></i>
 						<span>Dashboard</span>
@@ -237,6 +254,9 @@ Status: ✅ APROVADO PELO USUÁRIO
 			<main class="main-content">
 				<!-- Progress Section -->
 				<section class="progress-section">
+					<button class="toggle-progress-btn" title="Expandir/Recolher painel de progresso">
+						<i class="fas fa-chevron-up"></i>
+					</button>
 					<div class="progress-card">
 						<h2><i class="fas fa-chart-line"></i> Seu Progresso</h2>
 						<div class="progress-stats">
@@ -611,6 +631,10 @@ Status: ✅ APROVADO PELO USUÁRIO
 					<i class="fas fa-list"></i>
 					Tópicos
 				</button>
+				<button class="admin-tab-btn" data-tab="roadmaps">
+					<i class="fas fa-map"></i>
+					Roadmaps
+				</button>
 				<button class="admin-tab-btn" data-tab="tools">
 					<i class="fas fa-tools"></i>
 					Ferramentas
@@ -684,6 +708,19 @@ Status: ✅ APROVADO PELO USUÁRIO
 							<h3><i class="fas fa-list"></i> Tópicos Existentes</h3>
 							<div id="adminTopicsContainer" class="admin-list">
 								<!-- Lista de tópicos será carregada aqui -->
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tab: Roadmaps -->
+				<div id="adminTabRoadmaps" class="admin-tab-content">
+					<div class="admin-grid">
+						<div class="admin-card">
+							<h3><i class="fas fa-map"></i> Gerenciar Roadmaps</h3>
+							<p>Visualize e gerencie os roadmaps do sistema</p>
+							<div id="roadmapsAdminContainer" class="admin-list">
+								<!-- Lista de roadmaps será carregada aqui -->
 							</div>
 						</div>
 					</div>
@@ -784,21 +821,101 @@ Status: ✅ APROVADO PELO USUÁRIO
 				</div>
 				<form id="editTopicForm" class="modal-form">
 					<input type="hidden" id="editTopicId" name="id" />
-					<div class="form-group">
-						<label for="editTopicName">Nome do Tópico:</label>
-						<input type="text" id="editTopicName" name="name" required />
+					
+					<!-- Informações Básicas -->
+					<div class="form-section">
+						<h4>Informações Básicas</h4>
+						<div class="form-group">
+							<label for="editTopicName">Nome do Tópico:</label>
+							<input type="text" id="editTopicName" name="name" required />
+						</div>
+						<div class="form-group">
+							<label for="editTopicXp">XP do Tópico:</label>
+							<input type="number" id="editTopicXp" name="xp" required min="1" />
+						</div>
+						<div class="form-group">
+							<label for="editTopicLevel">Nível:</label>
+							<select id="editTopicLevel" name="levelId" required>
+								<option value="">Selecione um nível</option>
+								<!-- Opções serão carregadas dinamicamente -->
+							</select>
+						</div>
 					</div>
-					<div class="form-group">
-						<label for="editTopicXp">XP do Tópico:</label>
-						<input type="number" id="editTopicXp" name="xp" required min="1" />
+
+					<!-- Conteúdo do Tópico -->
+					<div class="form-section">
+						<h4>Conteúdo do Tópico</h4>
+						<div class="form-group">
+							<label for="editTopicVideo">
+								<i class="fab fa-youtube"></i> Link do Vídeo (YouTube):
+							</label>
+							<input type="url" id="editTopicVideo" name="videoUrl" 
+								   placeholder="https://www.youtube.com/watch?v=..." />
+						</div>
+						<div class="form-group">
+							<label for="editTopicDescription">
+								<i class="fas fa-align-left"></i> Descrição e Anotações:
+							</label>
+							<textarea id="editTopicDescription" name="description" 
+									  rows="4" placeholder="Adicione uma descrição detalhada, links úteis e anotações..."></textarea>
+						</div>
 					</div>
-					<div class="form-group">
-						<label for="editTopicLevel">Nível:</label>
-						<select id="editTopicLevel" name="levelId" required>
-							<option value="">Selecione um nível</option>
-							<!-- Opções serão carregadas dinamicamente -->
-						</select>
+
+					<!-- Upload de Arquivos -->
+					<div class="form-section">
+						<h4>Arquivos do Tópico</h4>
+						
+						<!-- Arquivos Existentes -->
+						<div class="form-group" id="existingFilesGroup">
+							<label>
+								<i class="fas fa-file-check"></i> Arquivos Existentes:
+							</label>
+							<div id="existingFilesList" class="existing-files-list">
+								<!-- Lista de arquivos existentes será exibida aqui -->
+							</div>
+						</div>
+						
+						<!-- Novos Arquivos -->
+						<div class="form-group">
+							<label for="editTopicFiles">
+								<i class="fas fa-file-pdf"></i> Adicionar Novos Arquivos PDF:
+							</label>
+							<div class="file-upload-container">
+								<input type="file" id="editTopicFiles" name="files" 
+									   multiple accept=".pdf" class="file-input" />
+								<label for="editTopicFiles" class="file-upload-btn">
+									<i class="fas fa-cloud-upload-alt"></i>
+									Selecionar Arquivos
+								</label>
+								<div id="fileList" class="file-list">
+									<!-- Lista de novos arquivos será exibida aqui -->
+								</div>
+							</div>
+						</div>
 					</div>
+
+					<!-- Links Externos -->
+					<div class="form-section">
+						<h4>Links Externos</h4>
+						<div id="resourcesList" class="resources-list">
+							<!-- Links serão listados aqui -->
+						</div>
+						<div class="form-group resource-add">
+							<input type="url" id="newResourceUrl" placeholder="URL do recurso" />
+							<input type="text" id="newResourceTitle" placeholder="Título do recurso" />
+							<select id="newResourceType">
+								<option value="link">Link</option>
+								<option value="article">Artigo</option>
+								<option value="documentation">Documentação</option>
+								<option value="github">GitHub</option>
+								<option value="video">Vídeo</option>
+							</select>
+							<button type="button" onclick="addResource()" class="btn btn-secondary">
+								<i class="fas fa-plus"></i> Adicionar
+							</button>
+						</div>
+					</div>
+
 					<div class="modal-actions">
 						<button type="button" class="btn btn-secondary" onclick="closeEditTopicModal()">
 							Cancelar
@@ -812,7 +929,51 @@ Status: ✅ APROVADO PELO USUÁRIO
 			</div>
 		</div>
 
+		<!-- Modal de Edição de Roadmap -->
+		<div id="editRoadmapModal" class="modal" style="display: none">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3><i class="fas fa-edit"></i> Editar Roadmap</h3>
+					<button class="close-btn" onclick="closeEditRoadmapModal()">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<form id="editRoadmapForm" class="modal-form">
+					<input type="hidden" id="editRoadmapId" name="id" />
+					<div class="form-group">
+						<label for="editRoadmapName">Nome do Roadmap:</label>
+						<input type="text" id="editRoadmapName" name="name" required 
+							placeholder="Ex: Roadmap Full Stack Developer" />
+					</div>
+					<div class="form-group">
+						<label for="editRoadmapDescription">Descrição:</label>
+						<textarea id="editRoadmapDescription" name="description" rows="3"
+							placeholder="Descrição do roadmap (opcional)"></textarea>
+					</div>
+					<div class="form-group">
+						<label>
+							<input type="checkbox" id="editRoadmapIsDefault" name="isDefault" />
+							Marcar como roadmap padrão
+						</label>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-secondary" onclick="closeEditRoadmapModal()">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-save"></i>
+							Salvar
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
 		<script src="app.js"></script>
+        <script src="progress-toggle.js"></script>
+        <script src="topic-modal.js"></script>
+        <script src="topic-click.js"></script>
+        <script src="admin-topic-edit.js"></script>
 
 		<!-- PWA Service Worker Registration -->
 		<script>
@@ -829,5 +990,81 @@ Status: ✅ APROVADO PELO USUÁRIO
 				});
 			}
 		</script>
-	</body>
+	        <!-- Topic Content Modal -->
+        <div id="topicModal" class="topic-modal" style="display: none;">
+            <div class="topic-modal-content">
+                <div class="topic-modal-header">
+                    <h2>
+                        <i class="fas fa-play-circle"></i>
+                        <span id="topicTitle">Nome do Tópico</span>
+                    </h2>
+                    <button class="topic-modal-close" onclick="closeTopicModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="topic-modal-body">
+                    <!-- Video Section -->
+                    <div class="video-section">
+                        <div class="video-container">
+                            <iframe id="topicVideo"
+                                    src=""
+                                    title="YouTube video player"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                    
+                    <!-- Resources Section -->
+                    <div class="resources-section">
+                        <h3><i class="fas fa-link"></i> Recursos Externos</h3>
+                        <div class="resource-list" id="resourceList">
+                            <!-- Resources will be inserted here -->
+                        </div>
+                        
+                        <!-- Description moved above files -->
+                        <div class="topic-description-section">
+                            <h3><i class="fas fa-align-left"></i> Descrição</h3>
+                            <div class="topic-description" id="topicDescription">
+                                <!-- Description will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <div class="files-section">
+                            <div class="files-section-header">
+                                <h3><i class="fas fa-file-alt"></i> Arquivos</h3>
+                                <button id="toggleNotesBtn" class="notes-toggle-btn" title="Mostrar/ocultar anotações pessoais">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <span>Minhas Anotações</span>
+                                </button>
+                            </div>
+                            <div class="file-list" id="topicFileList">
+                                <!-- Files will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Personal Notes Section -->
+                        <div id="personalNotesSection" class="personal-notes-section" style="display: none;">
+                            <div class="notes-header">
+                                <h3><i class="fas fa-sticky-note"></i> Minhas Anotações</h3>
+                                <button id="saveNotesBtn" class="save-notes-btn" title="Salvar anotações">
+                                    <i class="fas fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                            <textarea id="personalNotes" class="notes-textarea" 
+                                      placeholder="Adicione suas anotações pessoais sobre este tópico... Ex: resumo do que foi estudado, pontos importantes, dúvidas, etc."></textarea>
+                            <div class="notes-footer">
+                                <small class="notes-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    Suas anotações são salvas automaticamente e ficam disponíveis apenas para você.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

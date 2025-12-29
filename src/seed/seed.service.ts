@@ -17,11 +17,14 @@ export class SeedService {
 
 		this.logger.log("Iniciando seed do banco de dados...");
 
+		// Criar roadmap padrão primeiro
+		const defaultRoadmap = await this.createDefaultRoadmap();
+
 		// Criar usuário de teste
 		await this.createTestUser();
 
 		// Criar todos os 21 níveis
-		const levels = await this.createLevels();
+		const levels = await this.createLevels(defaultRoadmap.id);
 
 		// Criar tópicos para cada nível
 		await this.createTopics(levels);
@@ -39,6 +42,29 @@ export class SeedService {
 		await this.createPowerUps();
 
 		this.logger.log("Seed concluído com sucesso!");
+	}
+
+	private async createDefaultRoadmap() {
+		// Verificar se já existe roadmap padrão
+		let roadmap = await this.prisma.roadmap.findFirst({
+			where: { isDefault: true },
+		});
+
+		if (!roadmap) {
+			// Se não existe, criar um
+			roadmap = await this.prisma.roadmap.create({
+				data: {
+					name: "Roadmap Principal",
+					description: "Roadmap padrão do sistema com todos os níveis existentes",
+					isDefault: true,
+				},
+			});
+			this.logger.log("Roadmap padrão criado: " + roadmap.name);
+		} else {
+			this.logger.log("Roadmap padrão já existe: " + roadmap.name);
+		}
+
+		return roadmap;
 	}
 
 	private async createTestUser() {
@@ -63,7 +89,7 @@ export class SeedService {
 		}
 	}
 
-	private async createLevels() {
+	private async createLevels(roadmapId: number) {
 		const levelsData = [
 			{ name: "Nível 1 — Fundamentos da Web e da Internet" },
 			{ name: "Nível 2 — HTML com Maestria" },
@@ -91,7 +117,10 @@ export class SeedService {
 		const levels: any[] = [];
 		for (const levelData of levelsData) {
 			const level = await this.prisma.level.create({
-				data: levelData,
+				data: {
+					...levelData,
+					roadmapId: roadmapId,
+				},
 			});
 			levels.push(level);
 		}

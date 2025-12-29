@@ -43,8 +43,10 @@ export class BadgesService {
 		return badge;
 	}
 
-	async getUserBadges(userId: number) {
-		this.logger.log(`Getting badges for user ${userId}`);
+	async getUserBadges(userId: number, roadmapId?: number) {
+		this.logger.log(
+			`Getting badges for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+		);
 
 		// First check if user exists
 		const user = await this.prisma.user.findUnique({
@@ -56,20 +58,36 @@ export class BadgesService {
 			return [];
 		}
 
-		// Get user's progress to check completed levels
+		// Construir filtro de progresso por roadmap
+		const progressWhere: any = { userId, completed: true };
+		if (roadmapId) {
+			progressWhere.topic = {
+				level: {
+					roadmapId,
+				},
+			};
+		}
+
+		// Get user's progress to check completed levels (filtrado por roadmap se fornecido)
 		const userProgress = await this.prisma.progress.findMany({
-			where: { userId, completed: true },
+			where: progressWhere,
 			include: { topic: { include: { level: true } } },
 		});
 
-		this.logger.log(`Found ${userProgress.length} completed topics for user ${userId}`);
+		this.logger.log(
+			`Found ${userProgress.length} completed topics for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+		);
 
-		// Get completed level IDs
+		// Get completed level IDs (apenas do roadmap atual se fornecido)
 		const completedLevelIds = new Set();
 		for (const progress of userProgress) {
 			const levelId = progress.topic.levelId;
+			const levelWhere: any = { levelId };
+			if (roadmapId) {
+				levelWhere.level = { roadmapId };
+			}
 			const levelTopics = await this.prisma.topic.count({
-				where: { levelId },
+				where: levelWhere,
 			});
 			const completedTopics = userProgress.filter((p) => p.topic.levelId === levelId).length;
 
@@ -81,9 +99,13 @@ export class BadgesService {
 			}
 		}
 
-		// Get user's badges
+		// Get user's badges (filtrado por roadmap se fornecido)
+		const badgeWhere: any = { userId };
+		if (roadmapId) {
+			badgeWhere.roadmapId = roadmapId;
+		}
 		const userBadges = await this.prisma.userbadge.findMany({
-			where: { userId },
+			where: badgeWhere,
 			include: {
 				badge: true,
 			},
@@ -91,14 +113,18 @@ export class BadgesService {
 
 		this.logger.log(`Found ${userBadges.length} badges for user ${userId}`);
 
-		// Check if any completed levels don't have badges awarded
+		// Check if any completed levels don't have badges awarded (apenas badges do roadmap atual)
 		for (const levelId of completedLevelIds) {
-			const levelBadge = await this.prisma.badge.findFirst({
-				where: {
-					name: {
-						startsWith: `Nível ${levelId}`,
-					},
+			const badgeWhere: any = {
+				name: {
+					startsWith: `Nível ${levelId}`,
 				},
+			};
+			if (roadmapId) {
+				badgeWhere.roadmapId = roadmapId;
+			}
+			const levelBadge = await this.prisma.badge.findFirst({
+				where: badgeWhere,
 			});
 
 			if (levelBadge) {
@@ -107,14 +133,18 @@ export class BadgesService {
 					this.logger.warn(
 						`User ${userId} completed level ${levelId} but doesn't have the badge. Awarding now.`,
 					);
-					await this.awardBadgeToUser(userId, levelBadge.id);
+					await this.awardBadgeToUser(userId, levelBadge.id, roadmapId);
 				}
 			}
 		}
 
-		// Get updated badges after potential new awards
+		// Get updated badges after potential new awards (filtrado por roadmap se fornecido)
+		const updatedBadgeWhere: any = { userId };
+		if (roadmapId) {
+			updatedBadgeWhere.roadmapId = roadmapId;
+		}
 		const updatedUserBadges = await this.prisma.userbadge.findMany({
-			where: { userId },
+			where: updatedBadgeWhere,
 			include: {
 				badge: true,
 			},
@@ -129,65 +159,93 @@ export class BadgesService {
 			icon: userBadge.badge.icon,
 			category: userBadge.badge.category,
 			earnedAt: userBadge.earnedAt,
+			roadmapId: userBadge.roadmapId, // Incluir roadmapId para filtro no frontend
+			badge: {
+				id: userBadge.badge.id,
+				name: userBadge.badge.name,
+				description: userBadge.badge.description,
+				icon: userBadge.badge.icon,
+				category: userBadge.badge.category,
+				roadmapId: userBadge.badge.roadmapId,
+			},
 		}));
 	}
 
-	async awardBadgeToUser(userId: number, badgeId: number) {
-		// Check if user already has this badge
+	async awardBadgeToUser(userId: number, badgeId: number, roadmapId?: number) {
+		// Buscar o badge para obter o roadmapId se não foi fornecido
+		if (!roadmapId) {
+			const badge = await this.prisma.badge.findUnique({
+				where: { id: badgeId },
+			});
+			roadmapId = badge?.roadmapId || undefined;
+		}
+
+		// Check if user already has this badge in this roadmap
 		const existingUserBadge = await this.prisma.userbadge.findFirst({
 			where: {
 				userId,
 				badgeId,
+				roadmapId: roadmapId || undefined,
 			},
 		});
 
 		if (existingUserBadge) {
-			this.logger.log(`User ${userId} already has badge ${badgeId}`);
+			this.logger.log(`User ${userId} already has badge ${badgeId} in roadmap ${roadmapId}`);
 			return existingUserBadge;
 		}
 
-		// Award the badge
+		// Award the badge (com roadmapId)
 		const userBadge = await this.prisma.userbadge.create({
 			data: {
 				userId,
 				badgeId,
+				roadmapId: roadmapId || undefined,
 			},
 			include: {
 				badge: true,
 			},
 		});
 
-		this.logger.log(`Badge ${badgeId} awarded to user ${userId}`);
+		this.logger.log(`Badge ${badgeId} awarded to user ${userId} in roadmap ${roadmapId}`);
 
-		// Create notification for the user
+		// Create notification for the user (com roadmapId)
 		await this.prisma.notification.create({
 			data: {
 				userId,
 				title: "Novo Badge Conquistado! 🏅",
 				message: `Parabéns! Você conquistou o badge "${userBadge.badge.name}"!`,
 				type: "achievement",
+				roadmapId: roadmapId || undefined,
 			},
 		});
 
 		return userBadge;
 	}
 
-	async checkAndAwardLevelBadges(userId: number, levelId: number) {
-		this.logger.log(`🔍 Checking level badges for user ${userId}, level ${levelId}`);
+	async checkAndAwardLevelBadges(userId: number, levelId: number, roadmapId: number) {
+		this.logger.log(
+			`🔍 Checking level badges for user ${userId}, level ${levelId} in roadmap ${roadmapId}`,
+		);
 
-		// Get all topics for this level
+		// Get all topics for this level (apenas do roadmap atual)
 		const allTopicsInLevel = await this.prisma.topic.findMany({
 			where: {
 				levelId,
+				level: {
+					roadmapId,
+				},
 			},
 		});
 
-		// Get user's progress for this level
+		// Get user's progress for this level (apenas do roadmap atual)
 		const userProgress = await this.prisma.progress.findMany({
 			where: {
 				userId,
 				topic: {
 					levelId,
+					level: {
+						roadmapId,
+					},
 				},
 				completed: true, // Only get completed progress
 			},
@@ -196,34 +254,39 @@ export class BadgesService {
 			},
 		});
 
-		this.logger.log(`📊 Level ${levelId} stats:`);
+		this.logger.log(`📊 Level ${levelId} stats (roadmap ${roadmapId}):`);
 		this.logger.log(`  - Total topics in level: ${allTopicsInLevel.length}`);
 		this.logger.log(`  - Completed topics by user: ${userProgress.length}`);
 
 		// Check if ALL topics in this level are completed
-		const allTopicsCompleted = allTopicsInLevel.length > 0 && 
-									userProgress.length === allTopicsInLevel.length;
+		const allTopicsCompleted =
+			allTopicsInLevel.length > 0 && userProgress.length === allTopicsInLevel.length;
 
 		this.logger.log(`  - All topics completed: ${allTopicsCompleted}`);
 
 		if (allTopicsCompleted) {
-			// Find the badge for this level
+			// Find the badge for this level (apenas do roadmap atual)
 			const levelBadge = await this.prisma.badge.findFirst({
 				where: {
 					name: {
 						startsWith: `Nível ${levelId}`,
 					},
+					roadmapId,
 				},
 			});
 
 			if (levelBadge) {
-				await this.awardBadgeToUser(userId, levelBadge.id);
-				this.logger.log(`🏅 Level ${levelId} badge awarded to user ${userId}`);
+				await this.awardBadgeToUser(userId, levelBadge.id, roadmapId);
+				this.logger.log(
+					`🏅 Level ${levelId} badge awarded to user ${userId} in roadmap ${roadmapId}`,
+				);
 			} else {
-				this.logger.log(`❌ No badge found for level ${levelId}`);
+				this.logger.log(`❌ No badge found for level ${levelId} in roadmap ${roadmapId}`);
 			}
 		} else {
-			this.logger.log(`⏳ Level ${levelId} not completed yet (${userProgress.length}/${allTopicsInLevel.length} topics done)`);
+			this.logger.log(
+				`⏳ Level ${levelId} not completed yet (${userProgress.length}/${allTopicsInLevel.length} topics done)`,
+			);
 		}
 	}
 
@@ -241,14 +304,19 @@ export class BadgesService {
 		return deletedUserBadge;
 	}
 
-	async checkAndAwardFinalBadge(userId: number) {
-		this.logger.log(`Checking final badge for user ${userId}`);
+	async checkAndAwardFinalBadge(userId: number, roadmapId: number) {
+		this.logger.log(`Checking final badge for user ${userId} in roadmap ${roadmapId}`);
 
-		// Get all user's completed topics
+		// Get all user's completed topics (apenas do roadmap atual)
 		const userProgress = await this.prisma.progress.findMany({
 			where: {
 				userId,
 				completed: true,
+				topic: {
+					level: {
+						roadmapId,
+					},
+				},
 			},
 			include: {
 				topic: {
@@ -259,26 +327,29 @@ export class BadgesService {
 			},
 		});
 
-		// Get all levels
-		const allLevels = await this.prisma.level.findMany();
+		// Get all levels (apenas do roadmap atual)
+		const allLevels = await this.prisma.level.findMany({
+			where: { roadmapId },
+		});
 		const completedLevels = new Set(userProgress.map((progress) => progress.topic.levelId));
 
-		// Check if user completed all levels
+		// Check if user completed all levels (apenas do roadmap atual)
 		const allLevelsCompleted = allLevels.every((level) => completedLevels.has(level.id));
 
 		if (allLevelsCompleted) {
-			// Find the final badge
+			// Find the final badge (apenas do roadmap atual)
 			const finalBadge = await this.prisma.badge.findFirst({
 				where: {
 					name: {
 						contains: "Full-Stack Master Internacional",
 					},
+					roadmapId,
 				},
 			});
 
 			if (finalBadge) {
-				await this.awardBadgeToUser(userId, finalBadge.id);
-				this.logger.log(`Final badge awarded to user ${userId}`);
+				await this.awardBadgeToUser(userId, finalBadge.id, roadmapId);
+				this.logger.log(`Final badge awarded to user ${userId} in roadmap ${roadmapId}`);
 			}
 		}
 	}

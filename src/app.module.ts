@@ -14,6 +14,7 @@ import { AchievementsModule } from "./achievements/achievements.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { BadgesModule } from "./badges/badges.module";
 import { HealthModule } from "./health/health.module";
+import { RoadmapsModule } from "./roadmaps/roadmaps.module";
 
 import { PrismaService } from "./prisma/prisma.service";
 import { APP_FILTER } from "@nestjs/core";
@@ -41,6 +42,7 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 		NotificationsModule,
 		BadgesModule,
 		HealthModule,
+		RoadmapsModule,
 	],
 	controllers: [AppController],
 	providers: [

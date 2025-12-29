@@ -1,4 +1,13 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards, Version, Delete } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	Param,
+	ParseIntPipe,
+	UseGuards,
+	Version,
+	Delete,
+	Query,
+} from "@nestjs/common";
 import { BadgesService } from "./badges.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
@@ -21,8 +30,12 @@ export class BadgesController {
 	@Get("user/:userId")
 	@Version("1")
 	@UseGuards(JwtAuthGuard)
-	getUserBadges(@Param("userId", ParseIntPipe) userId: number) {
-		return this.badgesService.getUserBadges(userId);
+	getUserBadges(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.badgesService.getUserBadges(userId, roadmapIdNum);
 	}
 
 	@Delete("user/:userId/badge/:badgeId")
@@ -30,7 +43,7 @@ export class BadgesController {
 	@UseGuards(JwtAuthGuard)
 	removeBadgeFromUser(
 		@Param("userId", ParseIntPipe) userId: number,
-		@Param("badgeId", ParseIntPipe) badgeId: number
+		@Param("badgeId", ParseIntPipe) badgeId: number,
 	) {
 		return this.badgesService.removeBadgeFromUser(userId, badgeId);
 	}

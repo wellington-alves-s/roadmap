@@ -9,6 +9,7 @@ import {
 	UseGuards,
 	ParseIntPipe,
 	Version,
+	Query,
 } from "@nestjs/common";
 import { AchievementsService } from "./achievements.service";
 import { CreateAchievementDto } from "./dto/create-achievement.dto";
@@ -71,16 +72,23 @@ export class AchievementsController {
 	@Version("1")
 	@ApiOperation({ summary: "Buscar conquistas do usuário" })
 	@ApiResponse({ status: 200, description: "Conquistas do usuário" })
-	getUserAchievements(@Param("userId", ParseIntPipe) userId: number) {
-		return this.achievementsService.getUserAchievements(userId);
+	getUserAchievements(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.achievementsService.getUserAchievements(userId, roadmapIdNum);
 	}
 
 	@Post("check/:userId")
 	@Version("1")
 	@ApiOperation({ summary: "Verificar e conceder conquistas do usuário" })
 	@ApiResponse({ status: 200, description: "Conquistas verificadas" })
-	checkAndAwardAchievements(@Param("userId", ParseIntPipe) userId: number) {
-		return this.achievementsService.checkAndAwardAchievements(userId);
+	checkAndAwardAchievements(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId", ParseIntPipe) roadmapId: number,
+	) {
+		return this.achievementsService.checkAndAwardAchievements(userId, roadmapId);
 	}
 
 	@Post("clean-duplicates/:userId")

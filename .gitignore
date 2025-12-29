@@ -44,6 +44,7 @@ lerna-debug.log*
 
 # Sensitive configuration files
 docs/SENSITIVE_CONFIG.md
+docs/sensitive/
 *_SENSITIVE.md
 credentials.md
 secrets.md

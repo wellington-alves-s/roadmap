@@ -1,0 +1,18 @@
+.topic-item {
+    position: relative;
+}
+
+.topic-name {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.topic-name:hover {
+    color: var(--accent-primary);
+}
+
+/* Evita que o clique no botão Concluir abra o modal */
+.topic-status {
+    position: relative;
+    z-index: 2;
+}

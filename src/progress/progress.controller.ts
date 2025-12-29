@@ -71,8 +71,12 @@ export class ProgressController {
 	@Delete("reset/:userId")
 	@Version("1")
 	@UseGuards(JwtAuthGuard)
-	async resetProgress(@Param("userId") userId: string, @CurrentUser() user: any) {
-		return this.progressService.resetProgress(+userId);
+	async resetProgress(
+		@Param("userId") userId: string,
+		@Body() body?: { topicIds?: number[] },
+		@CurrentUser() user?: any,
+	) {
+		return this.progressService.resetProgress(+userId, body?.topicIds);
 	}
 
 	@Delete(":id")

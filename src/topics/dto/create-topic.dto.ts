@@ -1,5 +1,7 @@
 import { IsNotEmpty, IsString, IsInt, Min } from "class-validator";
 
+import { IsOptional, IsUrl } from "class-validator";
+
 export class CreateTopicDto {
 	@IsNotEmpty()
 	@IsString()
@@ -12,4 +14,12 @@ export class CreateTopicDto {
 	@IsInt()
 	@Min(1)
 	levelId: number;
+
+	@IsOptional()
+	@IsUrl()
+	videoUrl?: string;
+
+	@IsOptional()
+	@IsString()
+	description?: string;
 }

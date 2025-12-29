@@ -1,19 +1,19 @@
 /**
  * ⚠️  AVISO CRÍTICO - PROGRESS SERVICE PROTEGIDO - NÃO ALTERAR ⚠️
- * 
+ *
  * Este serviço gerencia o progresso dos usuários e é CRÍTICO para o sistema.
- * 
+ *
  * 🔒 FUNCIONALIDADES PROTEGIDAS:
  * - Lógica de completar tópicos
  * - Sistema de XP e estatísticas
  * - Relacionamentos com badges e achievements
  * - Cálculos de progresso e níveis
- * 
+ *
  * ⛔ NÃO ALTERAR SEM AUTORIZAÇÃO EXPRESSA
  * ⛔ NÃO MODIFICAR LÓGICA DE COMPLETAR TÓPICOS
  * ⛔ NÃO ALTERAR CÁLCULOS DE XP E ESTATÍSTICAS
  * ⛔ NÃO MODIFICAR SISTEMA DE BADGES/ACHIEVEMENTS
- * 
+ *
  * 📅 Última atualização: Sistema funcional e validado
  * 🔐 Status: ✅ PROTEGIDO - FUNCIONANDO PERFEITAMENTE
  */
@@ -227,12 +227,22 @@ export class ProgressService {
 
 		const topic = await this.prisma.topic.findUnique({
 			where: { id: topicId },
+			include: {
+				level: {
+					include: {
+						roadmap: true,
+					},
+				},
+			},
 		});
 
 		if (!topic) {
 			this.logger.warn(`Topic ${topicId} not found`);
 			throw new NotFoundException("Tópico não encontrado");
 		}
+
+		const roadmapId = topic.level.roadmapId;
+		this.logger.log(`📌 Roadmap ID do tópico: ${roadmapId}`);
 
 		// Verificar se já existe progresso para este tópico
 		let progress = await this.prisma.progress.findFirst({
@@ -272,11 +282,11 @@ export class ProgressService {
 		// Atualizar streak do usuário
 		await this.updateUserStreak(userId);
 
-		// Criar notificação de conclusão
-		await this.createCompletionNotification(userId, topic);
+		// Criar notificação de conclusão (com roadmapId)
+		await this.createCompletionNotification(userId, topic, roadmapId);
 
-		// Verificar se deve conceder badges
-		await this.checkAndAwardBadges(userId, topic.levelId);
+		// Verificar se deve conceder badges (com roadmapId)
+		await this.checkAndAwardBadges(userId, topic.levelId, roadmapId);
 
 		this.logger.log(`Topic ${topicId} completed successfully by user ${userId}`);
 
@@ -286,8 +296,10 @@ export class ProgressService {
 		};
 	}
 
-	async resetProgress(userId: number) {
-		this.logger.log(`🔄 Resetting progress for user ${userId}`);
+	async resetProgress(userId: number, topicIds?: number[]) {
+		this.logger.log(
+			`🔄 Resetting progress for user ${userId}${topicIds ? ` (filtered by ${topicIds.length} topics)` : " (all progress)"}`,
+		);
 
 		try {
 			// Verificar se o usuário existe
@@ -297,70 +309,122 @@ export class ProgressService {
 
 			if (!user) {
 				this.logger.error(`❌ User ${userId} not found`);
-				throw new Error('Usuário não encontrado');
+				throw new Error("Usuário não encontrado");
 			}
 
 			this.logger.log(`✅ User ${userId} found, proceeding with reset`);
 
-			// Deletar todo o progresso do usuário
-			this.logger.log(`🗑️ Deleting progress for user ${userId}`);
+			// Construir where clause para progresso
+			const progressWhere: any = { userId };
+			if (topicIds && topicIds.length > 0) {
+				progressWhere.topicId = { in: topicIds };
+			}
+
+			// Deletar progresso do usuário (filtrado por topicIds se fornecido)
+			this.logger.log(
+				`🗑️ Deleting progress for user ${userId}${topicIds ? ` (topics: ${topicIds.join(", ")})` : ""}`,
+			);
 			const deletedCount = await this.prisma.progress.deleteMany({
-				where: {
-					userId,
-				},
+				where: progressWhere,
 			});
 			this.logger.log(`✅ Deleted ${deletedCount.count} progress records`);
 
-			// Deletar todas as badges do usuário
-			this.logger.log(`🗑️ Deleting badges for user ${userId}`);
-			const deletedBadges = await this.prisma.userbadge.deleteMany({
-				where: {
-					userId,
-				},
+			// Obter roadmapId dos tópicos se topicIds foram fornecidos
+			let roadmapId: number | undefined = undefined;
+			if (topicIds && topicIds.length > 0) {
+				const firstTopic = await this.prisma.topic.findUnique({
+					where: { id: topicIds[0] },
+					include: { level: true },
+				});
+				if (firstTopic) {
+					roadmapId = firstTopic.level.roadmapId;
+					this.logger.log(`📌 Roadmap ID identificado: ${roadmapId}`);
+				}
+			}
+
+			// Deletar badges, conquistas, desafios e notificações (filtrado por roadmap se fornecido)
+			let deletedBadges = { count: 0 };
+			let deletedAchievements = { count: 0 };
+			let deletedChallenges = { count: 0 };
+
+			// Construir where clause para badges
+			const badgeWhere: any = { userId };
+			if (roadmapId) {
+				badgeWhere.roadmapId = roadmapId;
+			}
+			this.logger.log(
+				`🗑️ Deleting badges for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+			);
+			deletedBadges = await this.prisma.userbadge.deleteMany({
+				where: badgeWhere,
 			});
 			this.logger.log(`✅ Deleted ${deletedBadges.count} user badges`);
 
-			// Deletar todas as conquistas do usuário
-			this.logger.log(`🗑️ Deleting achievements for user ${userId}`);
-			const deletedAchievements = await this.prisma.userachievement.deleteMany({
-				where: {
-					userId,
-				},
+			// Construir where clause para achievements
+			const achievementWhere: any = { userId };
+			if (roadmapId) {
+				achievementWhere.roadmapId = roadmapId;
+			}
+			this.logger.log(
+				`🗑️ Deleting achievements for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+			);
+			deletedAchievements = await this.prisma.userachievement.deleteMany({
+				where: achievementWhere,
 			});
 			this.logger.log(`✅ Deleted ${deletedAchievements.count} user achievements`);
 
-			// Deletar todos os desafios do usuário
-			this.logger.log(`🗑️ Deleting challenges for user ${userId}`);
-			const deletedChallenges = await this.prisma.userchallenge.deleteMany({
-				where: {
-					userId,
-				},
+			// Construir where clause para challenges
+			const challengeWhere: any = { userId };
+			if (roadmapId) {
+				challengeWhere.roadmapId = roadmapId;
+			}
+			this.logger.log(
+				`🗑️ Deleting challenges for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+			);
+			deletedChallenges = await this.prisma.userchallenge.deleteMany({
+				where: challengeWhere,
 			});
 			this.logger.log(`✅ Deleted ${deletedChallenges.count} user challenges`);
 
-			// Resetar streak
-			this.logger.log(`🔄 Resetting user streak for user ${userId}`);
-			await this.prisma.user.update({
-				where: { id: userId },
-				data: {
-					currentStreak: 0,
-					lastActivityDate: null,
-				},
+			// Construir where clause para notifications
+			const notificationWhere: any = { userId };
+			if (roadmapId) {
+				notificationWhere.roadmapId = roadmapId;
+			}
+			this.logger.log(
+				`🗑️ Deleting notifications for user ${userId}${roadmapId ? ` in roadmap ${roadmapId}` : ""}`,
+			);
+			const deletedNotifications = await this.prisma.notification.deleteMany({
+				where: notificationWhere,
 			});
-			this.logger.log(`✅ User streak reset`);
+			this.logger.log(`✅ Deleted ${deletedNotifications.count} user notifications`);
+
+			// Resetar streak apenas se resetando tudo (sem topicIds)
+			if (!topicIds || topicIds.length === 0) {
+				this.logger.log(`🔄 Resetting user streak for user ${userId}`);
+				await this.prisma.user.update({
+					where: { id: userId },
+					data: {
+						currentStreak: 0,
+						lastActivityDate: null,
+					},
+				});
+				this.logger.log(`✅ User streak reset`);
+			}
 
 			const result = {
-				message: "Progresso, badges, conquistas e desafios resetados com sucesso",
+				message:
+					topicIds && topicIds.length > 0
+						? `Progresso de ${deletedCount.count} tópicos do roadmap, ${deletedBadges.count} badges, ${deletedAchievements.count} conquistas, ${deletedChallenges.count} desafios e ${deletedNotifications.count} notificações resetados com sucesso`
+						: "Progresso, badges, conquistas, desafios e notificações resetados com sucesso",
 				deletedProgress: deletedCount.count,
 				deletedBadges: deletedBadges.count,
 				deletedAchievements: deletedAchievements.count,
 				deletedChallenges: deletedChallenges.count,
+				deletedNotifications: deletedNotifications.count,
 			};
 
-			this.logger.log(
-				`✅ Progress reset successfully for user ${userId}:`,
-				result,
-			);
+			this.logger.log(`✅ Progress reset successfully for user ${userId}:`, result);
 
 			return result;
 		} catch (error) {
@@ -372,87 +436,99 @@ export class ProgressService {
 	async getUserStats(userId: number) {
 		this.logger.log(`Getting stats for user ${userId}`);
 
-		const user = await this.prisma.user.findUnique({
-			where: { id: userId },
-		});
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { id: userId },
+			});
 
-		if (!user) {
-			this.logger.warn(`User ${userId} not found`);
-			throw new NotFoundException("Usuário não encontrado");
-		}
+			if (!user) {
+				this.logger.warn(`User ${userId} not found`);
+				throw new NotFoundException("Usuário não encontrado");
+			}
 
-		// Buscar todos os progressos do usuário
-		const progress = await this.prisma.progress.findMany({
-			where: { userId },
-			include: {
-				topic: {
-					include: {
-						level: true,
+			// Buscar todos os progressos do usuário
+			const progress = await this.prisma.progress.findMany({
+				where: { userId },
+				include: {
+					topic: {
+						include: {
+							level: true,
+						},
 					},
 				},
-			},
-		});
+			});
 
-		// Calcular XP total
-		const totalXp = progress.filter((p) => p.completed).reduce((sum, p) => sum + p.topic.xp, 0);
+			// Calcular XP total (com proteção contra null)
+			const totalXp = progress
+				.filter((p) => p.completed && p.topic)
+				.reduce((sum, p) => sum + (p.topic?.xp || 0), 0);
 
-		// Buscar níveis
-		const levels = await this.levelsService.findAll();
+			// Buscar níveis
+			const levels = await this.levelsService.findAll();
 
-		// Encontrar nível atual baseado no progresso real
-		let currentLevel: any = null;
-		let progressToNextLevel = 0;
+			// Encontrar nível atual baseado no progresso real
+			let currentLevel: any = null;
+			let progressToNextLevel = 0;
 
-		// Ordenar níveis por ID
-		const sortedLevels = (levels as any[]).sort((a, b) => a.id - b.id);
+			// Ordenar níveis por ID
+			const sortedLevels = (levels as any[]).sort((a, b) => a.id - b.id);
 
-		for (const level of sortedLevels) {
-			const levelTopics = level.topics || [];
-			const completedTopicsInLevel = progress.filter(
-				(p) => p.completed && levelTopics.some((topic) => topic.id === p.topicId),
-			).length;
+			for (const level of sortedLevels) {
+				// Usar topic (singular) conforme schema do Prisma
+				const levelTopics = level.topic || [];
+				const completedTopicsInLevel = progress.filter(
+					(p) => p.completed && levelTopics.some((topic: any) => topic.id === p.topicId),
+				).length;
 
-			// Se há tópicos pendentes neste nível, este é o nível atual
-			if (completedTopicsInLevel < levelTopics.length) {
-				currentLevel = level;
-				// Calcular progresso dentro do nível atual
-				progressToNextLevel =
-					levelTopics.length > 0
-						? (completedTopicsInLevel / levelTopics.length) * 100
-						: 0;
-				break;
+				// Se há tópicos pendentes neste nível, este é o nível atual
+				if (completedTopicsInLevel < levelTopics.length) {
+					currentLevel = level;
+					// Calcular progresso dentro do nível atual
+					progressToNextLevel =
+						levelTopics.length > 0
+							? (completedTopicsInLevel / levelTopics.length) * 100
+							: 0;
+					break;
+				}
 			}
+
+			// Se todos os níveis foram concluídos, usar o último nível
+			if (!currentLevel && sortedLevels.length > 0) {
+				currentLevel = sortedLevels[sortedLevels.length - 1];
+				progressToNextLevel = 100;
+			}
+
+			// Calcular estatísticas adicionais
+			const totalTimeSpent = progress
+				.filter((p) => p.completed && p.timeSpent)
+				.reduce((sum, p) => sum + (p.timeSpent || 0), 0);
+
+			const averageAttempts =
+				progress.length > 0
+					? progress.reduce((sum, p) => sum + p.attempts, 0) / progress.length
+					: 0;
+
+			return {
+				userId,
+				totalXp,
+				currentLevel,
+				progressToNextLevel: Math.min(progressToNextLevel, 100),
+				completedTopics: progress.filter((p) => p.completed).length,
+				totalTopics: await this.prisma.topic.count(),
+				totalTimeSpent,
+				averageAttempts: Math.round(averageAttempts * 100) / 100,
+				currentStreak: user.currentStreak,
+				longestStreak: user.longestStreak,
+				progress,
+			};
+		} catch (error) {
+			this.logger.error(`Error in getUserStats for user ${userId}:`, error);
+			this.logger.error(
+				`Error stack:`,
+				error instanceof Error ? error.stack : "No stack trace",
+			);
+			throw error;
 		}
-
-		// Se todos os níveis foram concluídos, usar o último nível
-		if (!currentLevel && sortedLevels.length > 0) {
-			currentLevel = sortedLevels[sortedLevels.length - 1];
-			progressToNextLevel = 100;
-		}
-
-		// Calcular estatísticas adicionais
-		const totalTimeSpent = progress
-			.filter((p) => p.completed && p.timeSpent)
-			.reduce((sum, p) => sum + (p.timeSpent || 0), 0);
-
-		const averageAttempts =
-			progress.length > 0
-				? progress.reduce((sum, p) => sum + p.attempts, 0) / progress.length
-				: 0;
-
-		return {
-			userId,
-			totalXp,
-			currentLevel,
-			progressToNextLevel: Math.min(progressToNextLevel, 100),
-			completedTopics: progress.filter((p) => p.completed).length,
-			totalTopics: await this.prisma.topic.count(),
-			totalTimeSpent,
-			averageAttempts: Math.round(averageAttempts * 100) / 100,
-			currentStreak: user.currentStreak,
-			longestStreak: user.longestStreak,
-			progress,
-		};
 	}
 
 	private async updateUserStreak(userId: number) {
@@ -497,28 +573,29 @@ export class ProgressService {
 		});
 	}
 
-	private async createCompletionNotification(userId: number, topic: any) {
+	private async createCompletionNotification(userId: number, topic: any, roadmapId: number) {
 		await this.prisma.notification.create({
 			data: {
 				userId,
 				title: "Tópico Concluído!",
 				message: `Parabéns! Você concluiu "${topic.name}" e ganhou ${topic.xp} XP!`,
 				type: "achievement",
+				roadmapId: roadmapId || undefined,
 			},
 		});
 	}
 
-	private async checkAndAwardBadges(userId: number, levelId: number) {
+	private async checkAndAwardBadges(userId: number, levelId: number, roadmapId: number) {
 		try {
-			// Verificar badge do nível
-			await this.badgesService.checkAndAwardLevelBadges(userId, levelId);
+			// Verificar badge do nível (com roadmapId)
+			await this.badgesService.checkAndAwardLevelBadges(userId, levelId, roadmapId);
 
-			// Verificar badge final
-			await this.badgesService.checkAndAwardFinalBadge(userId);
+			// Verificar badge final (com roadmapId)
+			await this.badgesService.checkAndAwardFinalBadge(userId, roadmapId);
 
-			// Verificar conquistas
-			await this.achievementsService.checkAndAwardAchievements(userId);
-			
+			// Verificar conquistas (com roadmapId)
+			await this.achievementsService.checkAndAwardAchievements(userId, roadmapId);
+
 			// Limpar possíveis duplicatas (proteção extra)
 			await this.achievementsService.cleanDuplicateAchievements(userId);
 		} catch (error) {

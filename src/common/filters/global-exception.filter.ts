@@ -36,6 +36,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 					? exceptionResponse
 					: (exceptionResponse as any).message || exception.message;
 		} else if (exception instanceof PrismaClientKnownRequestError) {
+			this.logger.error(`Prisma Error Code: ${exception.code}`);
+			this.logger.error(`Prisma Error Message: ${exception.message}`);
+			this.logger.error(`Prisma Meta: ${JSON.stringify(exception.meta)}`);
+			
 			switch (exception.code) {
 				case "P2002":
 					status = HttpStatus.CONFLICT;
@@ -49,9 +53,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 					status = HttpStatus.BAD_REQUEST;
 					message = "Violação de chave estrangeira";
 					break;
+				case "P2010":
+					status = HttpStatus.BAD_REQUEST;
+					message = `Erro de validação: ${exception.message}`;
+					break;
 				default:
 					status = HttpStatus.BAD_REQUEST;
-					message = "Erro de validação no banco de dados";
+					message = `Erro de validação no banco de dados: ${exception.message || exception.code}`;
 			}
 		} else if (exception instanceof Error) {
 			message = exception.message;

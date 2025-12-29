@@ -1,19 +1,19 @@
 /**
  * ⚠️  AVISO CRÍTICO - LEVELS SERVICE PROTEGIDO - NÃO ALTERAR ⚠️
- * 
+ *
  * Este serviço gerencia níveis e é parte crítica do sistema de roadmap.
- * 
+ *
  * 🔒 FUNCIONALIDADES PROTEGIDAS:
  * - Cache invalidation após operações CRUD
  * - Relacionamentos com tópicos
  * - Sistema de XP distribution
  * - Transações para exclusão segura
- * 
+ *
  * ⛔ NÃO ALTERAR SEM AUTORIZAÇÃO EXPRESSA
  * ⛔ NÃO MODIFICAR LÓGICA DE CACHE
  * ⛔ NÃO ALTERAR RELACIONAMENTOS COM TÓPICOS
  * ⛔ NÃO MODIFICAR SISTEMA DE TRANSAÇÕES
- * 
+ *
  * 📅 Última atualização: Sistema funcional e validado
  * 🔐 Status: ✅ PROTEGIDO - FUNCIONANDO PERFEITAMENTE
  */
@@ -58,25 +58,38 @@ export class LevelsService {
 		}
 
 		// Invalidate all related caches
-		await Promise.all([
-			this.cacheManager.del("levels"),
-			this.cacheManager.del("topics"),
-			this.cacheManager.del(`level:${level.id}`),
-			this.cacheManager.del("dashboard"),
-		]);
+		const cacheKeys = [
+			"levels",
+			`levels:roadmap:${createLevelDto.roadmapId}`,
+			"topics",
+			`level:${level.id}`,
+			"dashboard",
+		];
+		await Promise.all(cacheKeys.map((key) => this.cacheManager.del(key)));
 
 		return level;
 	}
 
-	async findAll() {
-		this.logger.log("Fetching levels from database with fresh data");
+	async findAll(roadmapId?: number) {
+		this.logger.log(
+			`Fetching levels from database${roadmapId ? ` for roadmap ${roadmapId}` : ""} with fresh data`,
+		);
+
+		// Limpar cache antes de buscar
+		if (roadmapId) {
+			await this.cacheManager.del(`levels:roadmap:${roadmapId}`);
+		}
+		await this.cacheManager.del("levels");
+
+		const where = roadmapId ? { roadmapId } : {};
 
 		const levels = await this.prisma.level.findMany({
+			where,
 			include: {
 				topic: {
 					orderBy: {
-						xp: "asc"
-					}
+						xp: "asc",
+					},
 				},
 				_count: {
 					select: {
@@ -90,12 +103,13 @@ export class LevelsService {
 		});
 
 		this.logger.log(`Found ${levels.length} levels with topics`);
-		levels.forEach(level => {
+		levels.forEach((level) => {
 			this.logger.log(`Level ${level.name}: ${level.topic.length} topics`);
 		});
 
 		// Cache the result for 1 minute only to ensure fresh data
-		await this.cacheManager.set("levels", levels, 60000);
+		const cacheKey = roadmapId ? `levels:roadmap:${roadmapId}` : "levels";
+		await this.cacheManager.set(cacheKey, levels, 60000);
 
 		return levels;
 	}
@@ -153,9 +167,14 @@ export class LevelsService {
 			}
 		}
 
-		// Invalidate cache
-		await this.cacheManager.del("levels");
-		await this.cacheManager.del(`level:${id}`);
+		// Invalidate cache (considerar roadmapId antigo e novo se mudou)
+		const oldRoadmapId = level.roadmapId;
+		const newRoadmapId = updateLevelDto.roadmapId || level.roadmapId;
+		const cacheKeys = ["levels", `levels:roadmap:${oldRoadmapId}`, `level:${id}`, "dashboard"];
+		if (newRoadmapId !== oldRoadmapId) {
+			cacheKeys.push(`levels:roadmap:${newRoadmapId}`);
+		}
+		await Promise.all(cacheKeys.map((key) => this.cacheManager.del(key)));
 
 		return updatedLevel;
 	}
@@ -166,10 +185,10 @@ export class LevelsService {
 			include: {
 				topic: {
 					include: {
-						progress: true
-					}
-				}
-			}
+						progress: true,
+					},
+				},
+			},
 		});
 
 		if (!level) {
@@ -182,30 +201,35 @@ export class LevelsService {
 			for (const topic of level.topic) {
 				if (topic.progress.length > 0) {
 					await prisma.progress.deleteMany({
-						where: { topicId: topic.id }
+						where: { topicId: topic.id },
 					});
 				}
 			}
 
 			// 2. Excluir todos os tópicos do nível
 			await prisma.topic.deleteMany({
-				where: { levelId: id }
+				where: { levelId: id },
 			});
 
 			// 3. Finalmente, excluir o nível
 			await prisma.level.delete({
-				where: { id }
+				where: { id },
 			});
 		});
 
+		// Salvar roadmapId antes de deletar para invalidar cache correto
+		const roadmapId = level.roadmapId;
+
 		// Invalidate all related caches
-		await Promise.all([
-			this.cacheManager.del("levels"),
-			this.cacheManager.del(`level:${id}`),
-			this.cacheManager.del("topics"),
-			this.cacheManager.del("dashboard"),
-			this.cacheManager.del("progress"),
-		]);
+		const cacheKeys = [
+			"levels",
+			`levels:roadmap:${roadmapId}`,
+			`level:${id}`,
+			"topics",
+			"dashboard",
+			"progress",
+		];
+		await Promise.all(cacheKeys.map((key) => this.cacheManager.del(key)));
 
 		return { message: "Nível e seus tópicos excluídos com sucesso" };
 	}

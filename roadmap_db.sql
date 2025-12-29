@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 16/08/2025 às 00:55
+-- Tempo de geração: 29-Dez-2025 às 01:40
 -- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
+-- versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `achievement`
+-- Estrutura da tabela `achievement`
 --
 
 CREATE TABLE `achievement` (
@@ -33,68 +33,69 @@ CREATE TABLE `achievement` (
   `description` varchar(191) NOT NULL,
   `icon` varchar(191) NOT NULL,
   `condition` varchar(191) NOT NULL,
-  `xpReward` int(11) NOT NULL DEFAULT 0
+  `xpReward` int(11) NOT NULL DEFAULT 0,
+  `roadmapId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `achievement`
+-- Extraindo dados da tabela `achievement`
 --
 
-INSERT INTO `achievement` (`id`, `name`, `description`, `icon`, `condition`, `xpReward`) VALUES
-(1, 'Primeiro Passo', 'Complete seu primeiro tópico', '🎯', '[{\"type\": \"topics_completed_exactly\", \"value\": 1}]', 50),
-(2, 'Em Movimento', 'Complete 3 tópicos', '🚶', '[{\"type\": \"topics_completed_exactly\", \"value\": 3}]', 75),
-(3, 'Estudioso', 'Complete 5 tópicos', '📚', '[{\"type\": \"topics_completed_exactly\", \"value\": 5}]', 100),
-(4, 'Persistente', 'Complete 10 tópicos', '💪', '[{\"type\": \"topics_completed_exactly\", \"value\": 10}]', 150),
-(5, 'Dedicado', 'Complete 20 tópicos', '⭐', '[{\"type\": \"topics_completed_exactly\", \"value\": 20}]', 200),
-(6, 'Mestre', 'Complete 50 tópicos', '👑', '[{\"type\": \"topics_completed_exactly\", \"value\": 50}]', 300),
-(7, 'Fundamentos Concluídos', 'Complete o Nível 1 - Fundamentos da Web', '🌐', '[{\"type\": \"level_completed\", \"value\": 1}]', 100),
-(8, 'HTML Master', 'Complete o Nível 2 - HTML com Maestria', '📄', '[{\"type\": \"level_completed\", \"value\": 2}]', 100),
-(9, 'CSS Expert', 'Complete o Nível 3 - CSS do Básico ao Avançado', '🎨', '[{\"type\": \"level_completed\", \"value\": 3}]', 125),
-(10, 'Git Ninja', 'Complete o Nível 4 - Git e GitHub', '🐙', '[{\"type\": \"level_completed\", \"value\": 4}]', 100),
-(11, 'Logic Master', 'Complete o Nível 5 - Lógica de Programação', '🧠', '[{\"type\": \"level_completed\", \"value\": 5}]', 125),
-(12, 'JavaScript Wizard', 'Complete o Nível 6 - JavaScript com Maestria', '⚡', '[{\"type\": \"level_completed\", \"value\": 6}]', 125),
-(13, 'Consistente', 'Mantenha um streak de 3 dias', '🔥', '[{\"type\": \"streak_days\", \"value\": 3}]', 100),
-(14, 'Disciplinado', 'Mantenha um streak de 7 dias', '🎖️', '[{\"type\": \"streak_days\", \"value\": 7}]', 200),
-(15, 'Veterano', 'Mantenha um streak de 30 dias', '🏆', '[{\"type\": \"streak_days\", \"value\": 30}]', 500),
-(16, 'Colecionador', 'Acumule 500 XP', '💰', '[{\"type\": \"total_xp\", \"value\": 500}]', 100),
-(17, 'XP Master', 'Acumule 1000 XP', '💎', '[{\"type\": \"total_xp\", \"value\": 1000}]', 200),
-(18, 'XP Legend', 'Acumule 2500 XP', '👑', '[{\"type\": \"total_xp\", \"value\": 2500}]', 500),
-(19, 'Centena', 'Complete 100 tópicos', '💯', '[{\"type\": \"topics_completed_exactly\", \"value\": 100}]', 500),
-(20, 'Maratonista', 'Complete 150 tópicos', '🏃‍♂️', '[{\"type\": \"topics_completed_exactly\", \"value\": 150}]', 750),
-(21, 'Lenda', 'Complete todos os tópicos disponíveis', '🌟', '[{\"type\": \"topics_completed_exactly\", \"value\": 200}]', 1500),
-(22, 'Backend Master', 'Complete o Nível 7 - Node.js Fundamentals', '⚙️', '[{\"type\": \"level_completed\", \"value\": 7}]', 150),
-(23, 'Database Guru', 'Complete o Nível 8 - Bancos de Dados', '🗄️', '[{\"type\": \"level_completed\", \"value\": 8}]', 150),
-(24, 'API Architect', 'Complete o Nível 9 - APIs e Integração', '🔗', '[{\"type\": \"level_completed\", \"value\": 9}]', 175),
-(25, 'Framework Ninja', 'Complete o Nível 10 - Frameworks Modernos', '🥷', '[{\"type\": \"level_completed\", \"value\": 10}]', 175),
-(26, 'DevOps Explorer', 'Complete o Nível 11 - DevOps e Deploy', '🚀', '[{\"type\": \"level_completed\", \"value\": 11}]', 200),
-(27, 'XP Titan', 'Acumule 5000 XP', '⚡', '[{\"type\": \"total_xp\", \"value\": 5000}]', 750),
-(28, 'XP God', 'Acumule 10000 XP', '🌟', '[{\"type\": \"total_xp\", \"value\": 10000}]', 1000),
-(29, 'Inabalável', 'Mantenha um streak de 15 dias', '💪', '[{\"type\": \"streak_days\", \"value\": 15}]', 300),
-(30, 'Imparável', 'Mantenha um streak de 60 dias', '🔥', '[{\"type\": \"streak_days\", \"value\": 60}]', 750),
-(31, 'Lendário', 'Mantenha um streak de 100 dias', '👑', '[{\"type\": \"streak_days\", \"value\": 100}]', 1500),
-(32, 'Velocista', 'Complete 5 tópicos em um único dia', '💨', '[{\"type\": \"topics_per_day\", \"value\": 5}]', 150),
-(33, 'Relâmpago', 'Complete 10 tópicos em um único dia', '⚡', '[{\"type\": \"topics_per_day\", \"value\": 10}]', 300),
-(34, 'Supersônico', 'Complete 15 tópicos em um único dia', '🚀', '[{\"type\": \"topics_per_day\", \"value\": 15}]', 500),
-(35, 'Explorador', 'Complete pelo menos 1 tópico em 5 níveis diferentes', '🗺️', '[{\"type\": \"levels_touched\", \"value\": 5}]', 200),
-(36, 'Aventureiro', 'Complete pelo menos 1 tópico em 10 níveis diferentes', '🎒', '[{\"type\": \"levels_touched\", \"value\": 10}]', 350),
-(37, 'Desbravador', 'Complete pelo menos 1 tópico em todos os 21 níveis', '🧭', '[{\"type\": \"levels_touched\", \"value\": 21}]', 750),
-(38, 'Frontend Developer', 'Complete os níveis básicos de Frontend (1-3, 6)', '🎨', '[{\"type\": \"specific_levels_completed\", \"value\": [1, 2, 3, 6]}]', 400),
-(39, 'Backend Developer', 'Complete os níveis de Backend (4, 5, 7, 8, 9)', '⚙️', '[{\"type\": \"specific_levels_completed\", \"value\": [4, 5, 7, 8, 9]}]', 600),
-(40, 'Full Stack Developer', 'Complete todos os níveis principais (1-12)', '🚀', '[{\"type\": \"specific_levels_completed\", \"value\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}]', 1000),
-(41, 'Internacional', 'Complete os níveis de soft skills e inglês', '🌍', '[{\"type\": \"specific_levels_completed\", \"value\": [19, 20, 21]}]', 500),
-(42, 'Primeiro Nível', 'Complete seu primeiro nível completo', '🥇', '[{\"type\": \"levels_completed_exactly\", \"value\": 1}]', 150),
-(43, 'Trio de Ouro', 'Complete 3 níveis completos', '🥉', '[{\"type\": \"levels_completed_exactly\", \"value\": 3}]', 300),
-(44, 'Meia Dúzia', 'Complete 6 níveis completos', '🎯', '[{\"type\": \"levels_completed_exactly\", \"value\": 6}]', 500),
-(45, 'Dezena Dourada', 'Complete 10 níveis completos', '🏆', '[{\"type\": \"levels_completed_exactly\", \"value\": 10}]', 750),
-(46, 'Completista', 'Complete todos os 21 níveis', '👑', '[{\"type\": \"levels_completed_exactly\", \"value\": 21}]', 2000),
-(47, 'Madrugador', 'Complete um tópico antes das 8h', '🌅', '[{\"type\": \"early_bird\", \"value\": 8}]', 100),
-(48, 'Coruja', 'Complete um tópico depois das 22h', '🦉', '[{\"type\": \"night_owl\", \"value\": 22}]', 100),
-(49, 'Fim de Semana', 'Complete 5 tópicos no fim de semana', '🏖️', '[{\"type\": \"weekend_warrior\", \"value\": 5}]', 200);
+INSERT INTO `achievement` (`id`, `name`, `description`, `icon`, `condition`, `xpReward`, `roadmapId`) VALUES
+(1, 'Primeiro Passo', 'Complete seu primeiro tópico', '🎯', '[{\"type\": \"topics_completed_exactly\", \"value\": 1}]', 50, 1),
+(2, 'Em Movimento', 'Complete 3 tópicos', '🚶', '[{\"type\": \"topics_completed_exactly\", \"value\": 3}]', 75, 1),
+(3, 'Estudioso', 'Complete 5 tópicos', '📚', '[{\"type\": \"topics_completed_exactly\", \"value\": 5}]', 100, 1),
+(4, 'Persistente', 'Complete 10 tópicos', '💪', '[{\"type\": \"topics_completed_exactly\", \"value\": 10}]', 150, 1),
+(5, 'Dedicado', 'Complete 20 tópicos', '⭐', '[{\"type\": \"topics_completed_exactly\", \"value\": 20}]', 200, 1),
+(6, 'Mestre', 'Complete 50 tópicos', '👑', '[{\"type\": \"topics_completed_exactly\", \"value\": 50}]', 300, 1),
+(7, 'Fundamentos Concluídos', 'Complete o Nível 1 - Fundamentos da Web', '🌐', '[{\"type\": \"level_completed\", \"value\": 1}]', 100, 1),
+(8, 'HTML Master', 'Complete o Nível 2 - HTML com Maestria', '📄', '[{\"type\": \"level_completed\", \"value\": 2}]', 100, 1),
+(9, 'CSS Expert', 'Complete o Nível 3 - CSS do Básico ao Avançado', '🎨', '[{\"type\": \"level_completed\", \"value\": 3}]', 125, 1),
+(10, 'Git Ninja', 'Complete o Nível 4 - Git e GitHub', '🐙', '[{\"type\": \"level_completed\", \"value\": 4}]', 100, 1),
+(11, 'Logic Master', 'Complete o Nível 5 - Lógica de Programação', '🧠', '[{\"type\": \"level_completed\", \"value\": 5}]', 125, 1),
+(12, 'JavaScript Wizard', 'Complete o Nível 6 - JavaScript com Maestria', '⚡', '[{\"type\": \"level_completed\", \"value\": 6}]', 125, 1),
+(13, 'Consistente', 'Mantenha um streak de 3 dias', '🔥', '[{\"type\": \"streak_days\", \"value\": 3}]', 100, 1),
+(14, 'Disciplinado', 'Mantenha um streak de 7 dias', '🎖️', '[{\"type\": \"streak_days\", \"value\": 7}]', 200, 1),
+(15, 'Veterano', 'Mantenha um streak de 30 dias', '🏆', '[{\"type\": \"streak_days\", \"value\": 30}]', 500, 1),
+(16, 'Colecionador', 'Acumule 500 XP', '💰', '[{\"type\": \"total_xp\", \"value\": 500}]', 100, 1),
+(17, 'XP Master', 'Acumule 1000 XP', '💎', '[{\"type\": \"total_xp\", \"value\": 1000}]', 200, 1),
+(18, 'XP Legend', 'Acumule 2500 XP', '👑', '[{\"type\": \"total_xp\", \"value\": 2500}]', 500, 1),
+(19, 'Centena', 'Complete 100 tópicos', '💯', '[{\"type\": \"topics_completed_exactly\", \"value\": 100}]', 500, 1),
+(20, 'Maratonista', 'Complete 150 tópicos', '🏃‍♂️', '[{\"type\": \"topics_completed_exactly\", \"value\": 150}]', 750, 1),
+(21, 'Lenda', 'Complete todos os tópicos disponíveis', '🌟', '[{\"type\": \"topics_completed_exactly\", \"value\": 200}]', 1500, 1),
+(22, 'Backend Master', 'Complete o Nível 7 - Node.js Fundamentals', '⚙️', '[{\"type\": \"level_completed\", \"value\": 7}]', 150, 1),
+(23, 'Database Guru', 'Complete o Nível 8 - Bancos de Dados', '🗄️', '[{\"type\": \"level_completed\", \"value\": 8}]', 150, 1),
+(24, 'API Architect', 'Complete o Nível 9 - APIs e Integração', '🔗', '[{\"type\": \"level_completed\", \"value\": 9}]', 175, 1),
+(25, 'Framework Ninja', 'Complete o Nível 10 - Frameworks Modernos', '🥷', '[{\"type\": \"level_completed\", \"value\": 10}]', 175, 1),
+(26, 'DevOps Explorer', 'Complete o Nível 11 - DevOps e Deploy', '🚀', '[{\"type\": \"level_completed\", \"value\": 11}]', 200, 1),
+(27, 'XP Titan', 'Acumule 5000 XP', '⚡', '[{\"type\": \"total_xp\", \"value\": 5000}]', 750, 1),
+(28, 'XP God', 'Acumule 10000 XP', '🌟', '[{\"type\": \"total_xp\", \"value\": 10000}]', 1000, 1),
+(29, 'Inabalável', 'Mantenha um streak de 15 dias', '💪', '[{\"type\": \"streak_days\", \"value\": 15}]', 300, 1),
+(30, 'Imparável', 'Mantenha um streak de 60 dias', '🔥', '[{\"type\": \"streak_days\", \"value\": 60}]', 750, 1),
+(31, 'Lendário', 'Mantenha um streak de 100 dias', '👑', '[{\"type\": \"streak_days\", \"value\": 100}]', 1500, 1),
+(32, 'Velocista', 'Complete 5 tópicos em um único dia', '💨', '[{\"type\": \"topics_per_day\", \"value\": 5}]', 150, 1),
+(33, 'Relâmpago', 'Complete 10 tópicos em um único dia', '⚡', '[{\"type\": \"topics_per_day\", \"value\": 10}]', 300, 1),
+(34, 'Supersônico', 'Complete 15 tópicos em um único dia', '🚀', '[{\"type\": \"topics_per_day\", \"value\": 15}]', 500, 1),
+(35, 'Explorador', 'Complete pelo menos 1 tópico em 5 níveis diferentes', '🗺️', '[{\"type\": \"levels_touched\", \"value\": 5}]', 200, 1),
+(36, 'Aventureiro', 'Complete pelo menos 1 tópico em 10 níveis diferentes', '🎒', '[{\"type\": \"levels_touched\", \"value\": 10}]', 350, 1),
+(37, 'Desbravador', 'Complete pelo menos 1 tópico em todos os 21 níveis', '🧭', '[{\"type\": \"levels_touched\", \"value\": 21}]', 750, 1),
+(38, 'Frontend Developer', 'Complete os níveis básicos de Frontend (1-3, 6)', '🎨', '[{\"type\": \"specific_levels_completed\", \"value\": [1, 2, 3, 6]}]', 400, 1),
+(39, 'Backend Developer', 'Complete os níveis de Backend (4, 5, 7, 8, 9)', '⚙️', '[{\"type\": \"specific_levels_completed\", \"value\": [4, 5, 7, 8, 9]}]', 600, 1),
+(40, 'Full Stack Developer', 'Complete todos os níveis principais (1-12)', '🚀', '[{\"type\": \"specific_levels_completed\", \"value\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}]', 1000, 1),
+(41, 'Internacional', 'Complete os níveis de soft skills e inglês', '🌍', '[{\"type\": \"specific_levels_completed\", \"value\": [19, 20, 21]}]', 500, 1),
+(42, 'Primeiro Nível', 'Complete seu primeiro nível completo', '🥇', '[{\"type\": \"levels_completed_exactly\", \"value\": 1}]', 150, 1),
+(43, 'Trio de Ouro', 'Complete 3 níveis completos', '🥉', '[{\"type\": \"levels_completed_exactly\", \"value\": 3}]', 300, 1),
+(44, 'Meia Dúzia', 'Complete 6 níveis completos', '🎯', '[{\"type\": \"levels_completed_exactly\", \"value\": 6}]', 500, 1),
+(45, 'Dezena Dourada', 'Complete 10 níveis completos', '🏆', '[{\"type\": \"levels_completed_exactly\", \"value\": 10}]', 750, 1),
+(46, 'Completista', 'Complete todos os 21 níveis', '👑', '[{\"type\": \"levels_completed_exactly\", \"value\": 21}]', 2000, 1),
+(47, 'Madrugador', 'Complete um tópico antes das 8h', '🌅', '[{\"type\": \"early_bird\", \"value\": 8}]', 100, 1),
+(48, 'Coruja', 'Complete um tópico depois das 22h', '🦉', '[{\"type\": \"night_owl\", \"value\": 22}]', 100, 1),
+(49, 'Fim de Semana', 'Complete 5 tópicos no fim de semana', '🏖️', '[{\"type\": \"weekend_warrior\", \"value\": 5}]', 200, 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `analytics`
+-- Estrutura da tabela `analytics`
 --
 
 CREATE TABLE `analytics` (
@@ -109,7 +110,7 @@ CREATE TABLE `analytics` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `badge`
+-- Estrutura da tabela `badge`
 --
 
 CREATE TABLE `badge` (
@@ -117,41 +118,42 @@ CREATE TABLE `badge` (
   `name` varchar(191) NOT NULL,
   `description` varchar(191) NOT NULL,
   `icon` varchar(191) NOT NULL,
-  `category` varchar(191) NOT NULL
+  `category` varchar(191) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `badge`
+-- Extraindo dados da tabela `badge`
 --
 
-INSERT INTO `badge` (`id`, `name`, `description`, `icon`, `category`) VALUES
-(1, 'Nível 1 — Fundamentos da Web e da Internet', 'Conquistou o conhecimento fundamental de como a internet funciona por trás dos navegadores.', '🌐', 'level'),
-(2, 'Nível 2 — HTML com Maestria', 'Dominou a construção estrutural de páginas com HTML semântico, limpo e acessível.', '🧱', 'level'),
-(3, 'Nível 3 — CSS do Básico ao Avançado', 'Domina completamente a estilização de páginas com CSS, incluindo responsividade e layout moderno.', '🎨', 'level'),
-(4, 'Nível 4 — Git e GitHub', 'Controla o histórico do seu código como um ninja do Git e colabora em alto nível com GitHub.', '🧬', 'level'),
-(5, 'Nível 5 — Lógica e Algoritmos', 'Pensamento lógico afiado, domina a construção de algoritmos e resolução de problemas.', '🧠', 'level'),
-(6, 'Nível 6 — JavaScript com Maestria', 'Domina a linguagem da web com fluidez em lógica, DOM, ES6+ e integração com a web moderna.', '🪄', 'level'),
-(7, 'Nível 7 — TypeScript Profissional', 'Domina TypeScript, trazendo segurança e robustez para projetos modernos com JS.', '🛡️', 'level'),
-(8, 'Nível 8 — React', 'Cria aplicações modernas e reativas com componentes, hooks e roteamento.', '⚛️', 'level'),
-(9, 'Nível 9 — Node.js com Express', 'Domina o backend com Node.js, rotas, middlewares e construção de APIs robustas.', '🔥', 'level'),
-(10, 'Nível 10 — Banco de Dados', 'Sabe modelar, manipular e consultar dados em bancos relacionais e NoSQL.', '🗄️', 'level'),
-(11, 'Nível 11 — NestJS', 'Cria APIs escaláveis com injeção de dependência, validações e arquitetura robusta.', '🧩', 'level'),
-(12, 'Nível 12 — APIs RESTful', 'Domina a criação e consumo de APIs REST com padrões profissionais e segurança.', '📨', 'level'),
-(13, 'Nível 13 — Autenticação e Autorização', 'Sabe proteger sistemas com JWT, roles e autenticação sólida.', '🔐', 'level'),
-(14, 'Nível 14 — Deploy e DevOps Básico', 'Consegue colocar seus projetos no ar com CI/CD, hospedagem e bancos na nuvem.', '🚀', 'level'),
-(15, 'Nível 15 — C# com ASP.NET Core', 'Domina a criação de APIs modernas com ASP.NET, orientação a objetos e boas práticas.', '🛡️⚔️', 'level'),
-(16, 'Nível 16 — Java com Spring Boot', 'Cria sistemas sólidos com Spring Boot, injeção de dependência e JPA.', '🥷☕', 'level'),
-(17, 'Nível 17 — Clean Code e Testes', 'Escreve código limpo, modular e testável seguindo padrões profissionais.', '🧼🧪', 'level'),
-(18, 'Nível 18 — Microserviços', 'Sabe quebrar sistemas em serviços independentes com Docker, mensageria e APIs.', '🎻', 'level'),
-(19, 'Nível 19 — Soft Skills e Produtividade', 'Gerencia tarefas com eficiência, colabora bem em times e se comunica com clareza.', '🧭', 'level'),
-(20, 'Nível 20 — Inglês Técnico e Profissional', 'Apresenta projetos, participa de reuniões e entrevistas em inglês com confiança.', '🗣️🌍', 'level'),
-(21, 'Nível 21 — Preparação para o Mercado Internacional', 'Está pronto para atuar em empresas no exterior, com currículo, portfólio e GitHub profissional.', '🧳💼', 'level'),
-(22, 'Full-Stack Master Internacional', 'Concluiu o roadmap completo, preparado para qualquer desafio técnico ou cultural.', '🧠👨‍💻🌍', 'final');
+INSERT INTO `badge` (`id`, `name`, `description`, `icon`, `category`, `roadmapId`) VALUES
+(1, 'Nível 1 — Fundamentos da Web e da Internet', 'Conquistou o conhecimento fundamental de como a internet funciona por trás dos navegadores.', '🌐', 'level', 1),
+(2, 'Nível 2 — HTML com Maestria', 'Dominou a construção estrutural de páginas com HTML semântico, limpo e acessível.', '🧱', 'level', 1),
+(3, 'Nível 3 — CSS do Básico ao Avançado', 'Domina completamente a estilização de páginas com CSS, incluindo responsividade e layout moderno.', '🎨', 'level', 1),
+(4, 'Nível 4 — Git e GitHub', 'Controla o histórico do seu código como um ninja do Git e colabora em alto nível com GitHub.', '🧬', 'level', 1),
+(5, 'Nível 5 — Lógica e Algoritmos', 'Pensamento lógico afiado, domina a construção de algoritmos e resolução de problemas.', '🧠', 'level', 1),
+(6, 'Nível 6 — JavaScript com Maestria', 'Domina a linguagem da web com fluidez em lógica, DOM, ES6+ e integração com a web moderna.', '🪄', 'level', 1),
+(7, 'Nível 7 — TypeScript Profissional', 'Domina TypeScript, trazendo segurança e robustez para projetos modernos com JS.', '🛡️', 'level', 1),
+(8, 'Nível 8 — React', 'Cria aplicações modernas e reativas com componentes, hooks e roteamento.', '⚛️', 'level', 1),
+(9, 'Nível 9 — Node.js com Express', 'Domina o backend com Node.js, rotas, middlewares e construção de APIs robustas.', '🔥', 'level', 1),
+(10, 'Nível 10 — Banco de Dados', 'Sabe modelar, manipular e consultar dados em bancos relacionais e NoSQL.', '🗄️', 'level', 1),
+(11, 'Nível 11 — NestJS', 'Cria APIs escaláveis com injeção de dependência, validações e arquitetura robusta.', '🧩', 'level', 1),
+(12, 'Nível 12 — APIs RESTful', 'Domina a criação e consumo de APIs REST com padrões profissionais e segurança.', '📨', 'level', 1),
+(13, 'Nível 13 — Autenticação e Autorização', 'Sabe proteger sistemas com JWT, roles e autenticação sólida.', '🔐', 'level', 1),
+(14, 'Nível 14 — Deploy e DevOps Básico', 'Consegue colocar seus projetos no ar com CI/CD, hospedagem e bancos na nuvem.', '🚀', 'level', 1),
+(15, 'Nível 15 — C# com ASP.NET Core', 'Domina a criação de APIs modernas com ASP.NET, orientação a objetos e boas práticas.', '🛡️⚔️', 'level', 1),
+(16, 'Nível 16 — Java com Spring Boot', 'Cria sistemas sólidos com Spring Boot, injeção de dependência e JPA.', '🥷☕', 'level', 1),
+(17, 'Nível 17 — Clean Code e Testes', 'Escreve código limpo, modular e testável seguindo padrões profissionais.', '🧼🧪', 'level', 1),
+(18, 'Nível 18 — Microserviços', 'Sabe quebrar sistemas em serviços independentes com Docker, mensageria e APIs.', '🎻', 'level', 1),
+(19, 'Nível 19 — Soft Skills e Produtividade', 'Gerencia tarefas com eficiência, colabora bem em times e se comunica com clareza.', '🧭', 'level', 1),
+(20, 'Nível 20 — Inglês Técnico e Profissional', 'Apresenta projetos, participa de reuniões e entrevistas em inglês com confiança.', '🗣️🌍', 'level', 1),
+(21, 'Nível 21 — Preparação para o Mercado Internacional', 'Está pronto para atuar em empresas no exterior, com currículo, portfólio e GitHub profissional.', '🧳💼', 'level', 1),
+(22, 'Full-Stack Master Internacional', 'Concluiu o roadmap completo, preparado para qualquer desafio técnico ou cultural.', '🧠👨‍💻🌍', 'final', 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `challenge`
+-- Estrutura da tabela `challenge`
 --
 
 CREATE TABLE `challenge` (
@@ -162,23 +164,40 @@ CREATE TABLE `challenge` (
   `xpReward` int(11) NOT NULL,
   `startDate` datetime(3) NOT NULL,
   `endDate` datetime(3) NOT NULL,
-  `conditions` varchar(191) NOT NULL
+  `conditions` varchar(191) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `challenge`
+-- Extraindo dados da tabela `challenge`
 --
 
-INSERT INTO `challenge` (`id`, `title`, `description`, `type`, `xpReward`, `startDate`, `endDate`, `conditions`) VALUES
-(1, 'Desafio Diário', 'Complete 2 tópicos hoje', 'daily', 100, '2025-08-11 02:45:14.654', '2025-08-12 02:45:14.654', '[{\"type\": \"topics_completed\", \"value\": 2}]'),
-(2, 'Desafio Semanal', 'Complete 10 tópicos esta semana', 'weekly', 300, '2025-08-11 02:45:14.654', '2025-08-18 02:45:14.654', '[{\"type\": \"topics_completed\", \"value\": 10}]'),
-(3, 'Desafio Frontend', 'Complete todos os tópicos de HTML, CSS e JavaScript', 'special', 500, '2025-08-11 02:45:14.654', '2025-09-10 02:45:14.654', '[{\"type\": \"levels_completed\", \"value\": [1, 2, 3, 6]}]'),
-(4, 'Desafio Backend', 'Complete todos os tópicos de Node.js, banco de dados e APIs', 'special', 500, '2025-08-11 02:45:14.654', '2025-09-10 02:45:14.654', '[{\"type\": \"levels_completed\", \"value\": [9, 10, 11, 12]}]');
+INSERT INTO `challenge` (`id`, `title`, `description`, `type`, `xpReward`, `startDate`, `endDate`, `conditions`, `roadmapId`) VALUES
+(1, 'Desafio Diário', 'Complete 2 tópicos hoje', 'daily', 100, '2025-08-11 02:45:14.654', '2025-08-12 02:45:14.654', '[{\"type\": \"topics_completed\", \"value\": 2}]', 1),
+(2, 'Desafio Semanal', 'Complete 10 tópicos esta semana', 'weekly', 300, '2025-08-11 02:45:14.654', '2025-08-18 02:45:14.654', '[{\"type\": \"topics_completed\", \"value\": 10}]', 1),
+(3, 'Desafio Frontend', 'Complete todos os tópicos de HTML, CSS e JavaScript', 'special', 500, '2025-08-11 02:45:14.654', '2025-09-10 02:45:14.654', '[{\"type\": \"levels_completed\", \"value\": [1, 2, 3, 6]}]', 1),
+(4, 'Desafio Backend', 'Complete todos os tópicos de Node.js, banco de dados e APIs', 'special', 500, '2025-08-11 02:45:14.654', '2025-09-10 02:45:14.654', '[{\"type\": \"levels_completed\", \"value\": [9, 10, 11, 12]}]', 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `leaderboard`
+-- Estrutura da tabela `file`
+--
+
+CREATE TABLE `file` (
+  `id` int(11) NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `path` varchar(191) NOT NULL,
+  `type` varchar(191) NOT NULL,
+  `size` int(11) NOT NULL,
+  `topicId` int(11) NOT NULL,
+  `uploadedAt` datetime(3) NOT NULL DEFAULT current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `leaderboard`
 --
 
 CREATE TABLE `leaderboard` (
@@ -192,7 +211,7 @@ CREATE TABLE `leaderboard` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `leaderboardentry`
+-- Estrutura da tabela `leaderboardentry`
 --
 
 CREATE TABLE `leaderboardentry` (
@@ -206,46 +225,47 @@ CREATE TABLE `leaderboardentry` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `level`
+-- Estrutura da tabela `level`
 --
 
 CREATE TABLE `level` (
   `id` int(11) NOT NULL,
   `name` varchar(191) NOT NULL,
-  `totalXp` int(11) DEFAULT NULL
+  `totalXp` int(11) DEFAULT NULL,
+  `roadmapId` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `level`
+-- Extraindo dados da tabela `level`
 --
 
-INSERT INTO `level` (`id`, `name`, `totalXp`) VALUES
-(1, 'Nível 1 — Fundamentos da Web e da Internet', NULL),
-(2, 'Nível 2 — HTML com Maestria', NULL),
-(3, 'Nível 3 — CSS do Básico ao Avançado', NULL),
-(4, 'Nível 4 — Git, GitHub e Controle de Versão', NULL),
-(5, 'Nível 5 — Lógica de Programação e Algoritmos', NULL),
-(6, 'Nível 6 — JavaScript com Maestria (Vanilla JS)', NULL),
-(7, 'Nível 7 — TypeScript do Zero à Proficiência', NULL),
-(8, 'Nível 8 — React (ou Angular/Vue)', NULL),
-(9, 'Nível 9 — Node.js com Express', NULL),
-(10, 'Nível 10 — Banco de Dados', NULL),
-(11, 'Nível 11 — NestJS com TypeScript (Back-End Avançado)', NULL),
-(12, 'Nível 12 — APIs RESTful e RESTful Patterns', NULL),
-(13, 'Nível 13 — Autenticação e Autorização', NULL),
-(14, 'Nível 14 — Deploy e DevOps Básico', NULL),
-(15, 'Nível 15 — C# com ASP.NET Core', NULL),
-(16, 'Nível 16 — Java com Spring Boot', NULL),
-(17, 'Nível 17 — Estrutura de Projetos, Clean Code e Testes', NULL),
-(18, 'Nível 18 — Microserviços (Opcional Avançado)', NULL),
-(19, 'Nível 19 — Soft Skills e Organização Profissional', NULL),
-(20, 'Nível 20 — Inglês Técnico e Profissional', NULL),
-(21, 'Nível 21 — Preparação para o Mercado Internacional', NULL);
+INSERT INTO `level` (`id`, `name`, `totalXp`, `roadmapId`) VALUES
+(1, 'Nível 1 — Fundamentos da Web e da Internet', NULL, 1),
+(2, 'Nível 2 — HTML com Maestria', NULL, 1),
+(3, 'Nível 3 — CSS do Básico ao Avançado', NULL, 1),
+(4, 'Nível 4 — Git, GitHub e Controle de Versão', NULL, 1),
+(5, 'Nível 5 — Lógica de Programação e Algoritmos', NULL, 1),
+(6, 'Nível 6 — JavaScript com Maestria (Vanilla JS)', NULL, 1),
+(7, 'Nível 7 — TypeScript do Zero à Proficiência', NULL, 1),
+(8, 'Nível 8 — React (ou Angular/Vue)', NULL, 1),
+(9, 'Nível 9 — Node.js com Express', NULL, 1),
+(10, 'Nível 10 — Banco de Dados', NULL, 1),
+(11, 'Nível 11 — NestJS com TypeScript (Back-End Avançado)', NULL, 1),
+(12, 'Nível 12 — APIs RESTful e RESTful Patterns', NULL, 1),
+(13, 'Nível 13 — Autenticação e Autorização', NULL, 1),
+(14, 'Nível 14 — Deploy e DevOps Básico', NULL, 1),
+(15, 'Nível 15 — C# com ASP.NET Core', NULL, 1),
+(16, 'Nível 16 — Java com Spring Boot', NULL, 1),
+(17, 'Nível 17 — Estrutura de Projetos, Clean Code e Testes', NULL, 1),
+(18, 'Nível 18 — Microserviços (Opcional Avançado)', NULL, 1),
+(19, 'Nível 19 — Soft Skills e Organização Profissional', NULL, 1),
+(20, 'Nível 20 — Inglês Técnico e Profissional', NULL, 1),
+(21, 'Nível 21 — Preparação para o Mercado Internacional', NULL, 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `mentor`
+-- Estrutura da tabela `mentor`
 --
 
 CREATE TABLE `mentor` (
@@ -259,7 +279,7 @@ CREATE TABLE `mentor` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `mentorship`
+-- Estrutura da tabela `mentorship`
 --
 
 CREATE TABLE `mentorship` (
@@ -274,7 +294,7 @@ CREATE TABLE `mentorship` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `notification`
+-- Estrutura da tabela `notification`
 --
 
 CREATE TABLE `notification` (
@@ -283,14 +303,35 @@ CREATE TABLE `notification` (
   `title` varchar(191) NOT NULL,
   `message` varchar(191) NOT NULL,
   `type` varchar(191) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL,
   `read` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Extraindo dados da tabela `notification`
+--
+
+INSERT INTO `notification` (`id`, `userId`, `title`, `message`, `type`, `roadmapId`, `read`, `createdAt`) VALUES
+(217, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"Web 1.0, 2.0, 3.0, WebSocket, REST\" e ganhou 20 XP!', 'achievement', NULL, 0, '2025-12-28 15:26:54.258'),
+(218, 1, 'Nova Conquista!', 'Você conquistou: Primeiro Passo', 'achievement', NULL, 0, '2025-12-28 15:26:54.282'),
+(219, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"Front-end vs Back-end vs Full-stack\" e ganhou 20 XP!', 'achievement', NULL, 0, '2025-12-28 15:26:55.392'),
+(220, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"HTTP e ciclos de requisição/resposta\" e ganhou 25 XP!', 'achievement', NULL, 0, '2025-12-28 15:26:56.301'),
+(221, 1, 'Nova Conquista!', 'Você conquistou: Em Movimento', 'achievement', NULL, 0, '2025-12-28 15:26:56.325'),
+(222, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"Hospedagem, domínios, servidores\" e ganhou 25 XP!', 'achievement', NULL, 0, '2025-12-28 15:26:59.712'),
+(223, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"O que é Internet (ISP, IP, DNS, HTTP, HTTPS, etc.)\" e ganhou 30 XP!', 'achievement', NULL, 0, '2025-12-28 15:27:00.457'),
+(224, 1, 'Nova Conquista!', 'Você conquistou: Estudioso', 'achievement', NULL, 0, '2025-12-28 15:27:00.479'),
+(225, 1, 'Nova Conquista!', 'Você conquistou: Velocista', 'achievement', NULL, 0, '2025-12-28 15:27:00.510'),
+(226, 1, 'Nova Conquista!', 'Você conquistou: Fim de Semana', 'achievement', NULL, 0, '2025-12-28 15:27:00.544'),
+(227, 1, 'Tópico Concluído!', 'Parabéns! Você concluiu \"Como funciona a Web (Cliente, Servidor, Navegador)\" e ganhou 30 XP!', 'achievement', NULL, 0, '2025-12-28 15:27:01.160'),
+(228, 1, 'Novo Badge Conquistado! 🏅', 'Parabéns! Você conquistou o badge \"Nível 1 — Fundamentos da Web e da Internet\"!', 'achievement', NULL, 0, '2025-12-28 15:27:01.173'),
+(229, 1, 'Nova Conquista!', 'Você conquistou: Fundamentos Concluídos', 'achievement', NULL, 0, '2025-12-28 15:27:01.191'),
+(230, 1, 'Nova Conquista!', 'Você conquistou: Primeiro Nível', 'achievement', NULL, 0, '2025-12-28 15:27:01.238');
+
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `powerup`
+-- Estrutura da tabela `powerup`
 --
 
 CREATE TABLE `powerup` (
@@ -303,7 +344,7 @@ CREATE TABLE `powerup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `powerup`
+-- Extraindo dados da tabela `powerup`
 --
 
 INSERT INTO `powerup` (`id`, `name`, `description`, `effect`, `duration`, `cost`) VALUES
@@ -314,7 +355,7 @@ INSERT INTO `powerup` (`id`, `name`, `description`, `effect`, `duration`, `cost`
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `progress`
+-- Estrutura da tabela `progress`
 --
 
 CREATE TABLE `progress` (
@@ -329,145 +370,197 @@ CREATE TABLE `progress` (
   `timeSpent` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Extraindo dados da tabela `progress`
+--
+
+INSERT INTO `progress` (`id`, `userId`, `topicId`, `completed`, `attempts`, `completedAt`, `difficulty`, `startedAt`, `timeSpent`) VALUES
+(110, 1, 5, 1, 1, '2025-12-28 15:26:54.244', NULL, '2025-12-28 15:26:54.244', NULL),
+(111, 1, 6, 1, 1, '2025-12-28 15:26:55.383', NULL, '2025-12-28 15:26:55.383', NULL),
+(112, 1, 3, 1, 1, '2025-12-28 15:26:56.293', NULL, '2025-12-28 15:26:56.293', NULL),
+(113, 1, 4, 1, 1, '2025-12-28 15:26:59.703', NULL, '2025-12-28 15:26:59.703', NULL),
+(114, 1, 1, 1, 1, '2025-12-28 15:27:00.450', NULL, '2025-12-28 15:27:00.450', NULL),
+(115, 1, 2, 1, 1, '2025-12-28 15:27:01.153', NULL, '2025-12-28 15:27:01.153', NULL);
+
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `topic`
+-- Estrutura da tabela `resource`
+--
+
+CREATE TABLE `resource` (
+  `id` int(11) NOT NULL,
+  `title` varchar(191) NOT NULL,
+  `url` varchar(191) NOT NULL,
+  `type` varchar(191) NOT NULL,
+  `description` text DEFAULT NULL,
+  `topicId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `roadmap`
+--
+
+CREATE TABLE `roadmap` (
+  `id` int(11) NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `description` varchar(191) DEFAULT NULL,
+  `isDefault` tinyint(1) NOT NULL DEFAULT 0,
+  `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updatedAt` datetime(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `roadmap`
+--
+
+INSERT INTO `roadmap` (`id`, `name`, `description`, `isDefault`, `createdAt`, `updatedAt`) VALUES
+(1, 'Roadmap Full Stack Developer', 'Roadmap completo de desenvolvimento web do básico ao avançado', 1, '2025-12-28 12:11:39.000', '2025-12-28 12:11:39.000'),
+(2, 'Inglês', NULL, 0, '2025-12-28 15:27:33.173', '2025-12-28 15:27:33.173');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `topic`
 --
 
 CREATE TABLE `topic` (
   `id` int(11) NOT NULL,
   `name` varchar(191) NOT NULL,
   `xp` int(11) NOT NULL,
-  `levelId` int(11) NOT NULL
+  `levelId` int(11) NOT NULL,
+  `videoUrl` varchar(191) DEFAULT NULL,
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `topic`
+-- Extraindo dados da tabela `topic`
 --
 
-INSERT INTO `topic` (`id`, `name`, `xp`, `levelId`) VALUES
-(1, 'O que é Internet (ISP, IP, DNS, HTTP, HTTPS, etc.)', 30, 1),
-(2, 'Como funciona a Web (Cliente, Servidor, Navegador)', 30, 1),
-(3, 'HTTP e ciclos de requisição/resposta', 25, 1),
-(4, 'Hospedagem, domínios, servidores', 25, 1),
-(5, 'Web 1.0, 2.0, 3.0, WebSocket, REST', 20, 1),
-(6, 'Front-end vs Back-end vs Full-stack', 20, 1),
-(7, 'Estrutura HTML', 25, 2),
-(8, 'Tags semânticas', 25, 2),
-(9, 'Imagens, links, listas, tabelas, formulários', 30, 2),
-(10, 'Acessibilidade', 20, 2),
-(11, 'SEO básico', 20, 2),
-(12, 'Projetos práticos: currículo, blog, portfólio', 30, 2),
-(13, 'Box model, cores, unidades, fontes', 25, 3),
-(14, 'Flexbox e Grid', 30, 3),
-(15, 'Position, z-index, display', 25, 3),
-(16, 'Media queries e responsividade', 25, 3),
-(17, 'Animações, transitions', 20, 3),
-(18, 'Bootstrap e Tailwind CSS (nível 2 opcional)', 25, 3),
-(19, 'Projeto prático: landing page responsiva', 30, 3),
-(20, 'Conceitos básicos de versionamento', 20, 4),
-(21, 'Comandos Git essenciais', 30, 4),
-(22, 'Repositórios, branches, merges, pull requests', 30, 4),
-(23, 'GitHub, SSH, .gitignore, forks, issues', 25, 4),
-(24, 'Fluxo Git colaborativo (Git Flow)', 25, 4),
-(25, 'Variáveis, tipos de dados', 25, 5),
-(26, 'Condicionais, loops', 30, 5),
-(27, 'Arrays e objetos', 25, 5),
-(28, 'Funções e escopos', 30, 5),
-(29, 'Estrutura de algoritmos', 25, 5),
-(30, 'Exercícios: lógica e resolução de problemas', 35, 5),
-(31, 'Sintaxe, operadores, funções', 25, 6),
-(32, 'DOM, eventos, manipulação', 30, 6),
-(33, 'Arrays, objetos, métodos', 30, 6),
-(34, 'Promises, Fetch API', 30, 6),
-(35, 'JSON, LocalStorage, ES6+', 25, 6),
-(36, 'Projeto prático: To-Do List, SPA simples', 30, 6),
-(37, 'Tipagem primitiva, arrays, objetos', 25, 7),
-(38, 'Enums, interfaces, type aliases', 30, 7),
-(39, 'Classes, generics', 30, 7),
-(40, 'Tipagem em funções e async', 25, 7),
-(41, 'Integração com projetos JS e React/Nest', 30, 7),
-(42, 'Componentes, props, state', 30, 8),
-(43, 'Eventos, renderização condicional', 25, 8),
-(44, 'Hooks (useState, useEffect, custom hooks)', 35, 8),
-(45, 'Context API, Router DOM', 30, 8),
-(46, 'Fetch/Axios, chamadas de API', 25, 8),
-(47, 'Projeto prático: painel com CRUD e autenticação', 35, 8),
-(48, 'Conceito de back-end e servidor web', 20, 9),
-(49, 'Node.js e NPM', 25, 9),
-(50, 'Express, rotas, middlewares', 30, 9),
-(51, 'APIs RESTful', 30, 9),
-(52, 'CRUD com arquivos JSON', 25, 9),
-(53, 'Projeto prático: API de tarefas', 30, 9),
-(54, 'Modelagem relacional (PostgreSQL ou MySQL)', 30, 10),
-(55, 'NoSQL (MongoDB básico)', 25, 10),
-(56, 'CRUD com SQL e ORM (Prisma/TypeORM)', 35, 10),
-(57, 'Relacionamentos e migrations', 30, 10),
-(58, 'Conexão Node.js ⇆ banco', 25, 10),
-(59, 'Projeto: API completa com banco real', 35, 10),
-(60, 'Módulos, controllers, services, decorators', 30, 11),
-(61, 'DTOs, Pipes, Guards', 30, 11),
-(62, 'Validação com class-validator', 25, 11),
-(63, 'Autenticação JWT', 30, 11),
-(64, 'Uploads, cache, interceptors', 30, 11),
-(65, 'Projeto: API real completa (blog, ecommerce, etc.)', 35, 11),
-(66, 'O que é uma API RESTful', 20, 12),
-(67, 'Métodos HTTP', 25, 12),
-(68, 'Boas práticas de URL', 25, 12),
-(69, 'Versionamento, status codes', 25, 12),
-(70, 'Teste com Postman/Insomnia', 25, 12),
-(71, 'Rate limiting, CORS, segurança básica', 30, 12),
-(72, 'Hash de senhas (bcrypt)', 25, 13),
-(73, 'JWT e refresh token', 30, 13),
-(74, 'Middleware de proteção', 25, 13),
-(75, 'RBAC: controle por função', 30, 13),
-(76, 'Cookies vs localStorage', 20, 13),
-(77, 'Proteção de rotas no front-end', 30, 13),
-(78, 'Deploy de front-end (Vercel, Netlify)', 25, 14),
-(79, 'Deploy de back-end (Render, Railway, EC2)', 30, 14),
-(80, 'Banco em nuvem (Supabase, PlanetScale, Neon)', 25, 14),
-(81, 'CI/CD básico com GitHub Actions', 30, 14),
-(82, 'Monitoramento e logs', 25, 14),
-(83, 'Sintaxe C#, tipos, classes, métodos', 30, 15),
-(84, 'ASP.NET Core MVC', 35, 15),
-(85, 'Entity Framework', 30, 15),
-(86, 'Web APIs em C#', 30, 15),
-(87, 'Projeto prático: API .NET com autenticação e banco', 35, 15),
-(88, 'Sintaxe Java', 30, 16),
-(89, 'Spring Boot: controllers, services, repositories', 35, 16),
-(90, 'JPA e Hibernate', 30, 16),
-(91, 'Beans, Injeção de Dependência', 30, 16),
-(92, 'Projeto prático: API Java com banco de dados', 35, 16),
-(93, 'Clean Architecture e SOLID', 30, 17),
-(94, 'Separação por camadas', 25, 17),
-(95, 'Testes unitários (Jest, JUnit)', 30, 17),
-(96, 'Testes de integração', 25, 17),
-(97, 'TDD, mocks e stubs', 30, 17),
-(98, 'Diferença entre monolito e microserviços', 25, 18),
-(99, 'Comunicação via HTTP e mensageria (RabbitMQ)', 30, 18),
-(100, 'API Gateway', 25, 18),
-(101, 'Docker + containers', 30, 18),
-(102, 'Deploy de microserviços', 30, 18),
-(103, 'Kanban, Trello, Notion', 20, 19),
-(104, 'Comunicação assíncrona', 25, 19),
-(105, 'Scrum, sprints, backlog', 30, 19),
-(106, 'Trabalho remoto produtivo', 25, 19),
-(107, 'Vocabulário de programação em inglês', 25, 20),
-(108, 'Treinamento de listening (áudios, vídeos, reuniões)', 30, 20),
-(109, 'Como se apresentar, falar de projetos', 25, 20),
-(110, 'Entrevistas técnicas: como responder perguntas comuns', 30, 20),
-(111, 'Técnicas de speaking: improviso, pronúncia, confiança', 30, 20),
-(112, 'Criação de portfólio internacional', 30, 21),
-(113, 'GitHub profissional', 25, 21),
-(114, 'Como criar um currículo em inglês', 25, 21),
-(115, 'Simulação de entrevista (mock interview)', 30, 21),
-(116, 'Onde encontrar vagas internacionais (LinkedIn, Turing, VanHack, etc.)', 30, 21);
+INSERT INTO `topic` (`id`, `name`, `xp`, `levelId`, `videoUrl`, `description`) VALUES
+(1, 'O que é Internet (ISP, IP, DNS, HTTP, HTTPS, etc.)', 30, 1, NULL, NULL),
+(2, 'Como funciona a Web (Cliente, Servidor, Navegador)', 30, 1, NULL, NULL),
+(3, 'HTTP e ciclos de requisição/resposta', 25, 1, NULL, NULL),
+(4, 'Hospedagem, domínios, servidores', 25, 1, NULL, NULL),
+(5, 'Web 1.0, 2.0, 3.0, WebSocket, REST', 20, 1, NULL, NULL),
+(6, 'Front-end vs Back-end vs Full-stack', 20, 1, NULL, NULL),
+(7, 'Estrutura HTML', 25, 2, NULL, NULL),
+(8, 'Tags semânticas', 25, 2, NULL, NULL),
+(9, 'Imagens, links, listas, tabelas, formulários', 30, 2, NULL, NULL),
+(10, 'Acessibilidade', 20, 2, NULL, NULL),
+(11, 'SEO básico', 20, 2, NULL, NULL),
+(12, 'Projetos práticos: currículo, blog, portfólio', 30, 2, NULL, NULL),
+(13, 'Box model, cores, unidades, fontes', 25, 3, NULL, NULL),
+(14, 'Flexbox e Grid', 30, 3, NULL, NULL),
+(15, 'Position, z-index, display', 25, 3, NULL, NULL),
+(16, 'Media queries e responsividade', 25, 3, NULL, NULL),
+(17, 'Animações, transitions', 20, 3, NULL, NULL),
+(18, 'Bootstrap e Tailwind CSS (nível 2 opcional)', 25, 3, NULL, NULL),
+(19, 'Projeto prático: landing page responsiva', 30, 3, NULL, NULL),
+(20, 'Conceitos básicos de versionamento', 20, 4, NULL, NULL),
+(21, 'Comandos Git essenciais', 30, 4, NULL, NULL),
+(22, 'Repositórios, branches, merges, pull requests', 30, 4, NULL, NULL),
+(23, 'GitHub, SSH, .gitignore, forks, issues', 25, 4, NULL, NULL),
+(24, 'Fluxo Git colaborativo (Git Flow)', 25, 4, NULL, NULL),
+(25, 'Variáveis, tipos de dados', 25, 5, NULL, NULL),
+(26, 'Condicionais, loops', 30, 5, NULL, NULL),
+(27, 'Arrays e objetos', 25, 5, NULL, NULL),
+(28, 'Funções e escopos', 30, 5, NULL, NULL),
+(29, 'Estrutura de algoritmos', 25, 5, NULL, NULL),
+(30, 'Exercícios: lógica e resolução de problemas', 35, 5, NULL, NULL),
+(31, 'Sintaxe, operadores, funções', 25, 6, NULL, NULL),
+(32, 'DOM, eventos, manipulação', 30, 6, NULL, NULL),
+(33, 'Arrays, objetos, métodos', 30, 6, NULL, NULL),
+(34, 'Promises, Fetch API', 30, 6, NULL, NULL),
+(35, 'JSON, LocalStorage, ES6+', 25, 6, NULL, NULL),
+(36, 'Projeto prático: To-Do List, SPA simples', 30, 6, NULL, NULL),
+(37, 'Tipagem primitiva, arrays, objetos', 25, 7, NULL, NULL),
+(38, 'Enums, interfaces, type aliases', 30, 7, NULL, NULL),
+(39, 'Classes, generics', 30, 7, NULL, NULL),
+(40, 'Tipagem em funções e async', 25, 7, NULL, NULL),
+(41, 'Integração com projetos JS e React/Nest', 30, 7, NULL, NULL),
+(42, 'Componentes, props, state', 30, 8, NULL, NULL),
+(43, 'Eventos, renderização condicional', 25, 8, NULL, NULL),
+(44, 'Hooks (useState, useEffect, custom hooks)', 35, 8, NULL, NULL),
+(45, 'Context API, Router DOM', 30, 8, NULL, NULL),
+(46, 'Fetch/Axios, chamadas de API', 25, 8, NULL, NULL),
+(47, 'Projeto prático: painel com CRUD e autenticação', 35, 8, NULL, NULL),
+(48, 'Conceito de back-end e servidor web', 20, 9, NULL, NULL),
+(49, 'Node.js e NPM', 25, 9, NULL, NULL),
+(50, 'Express, rotas, middlewares', 30, 9, NULL, NULL),
+(51, 'APIs RESTful', 30, 9, NULL, NULL),
+(52, 'CRUD com arquivos JSON', 25, 9, NULL, NULL),
+(53, 'Projeto prático: API de tarefas', 30, 9, NULL, NULL),
+(54, 'Modelagem relacional (PostgreSQL ou MySQL)', 30, 10, NULL, NULL),
+(55, 'NoSQL (MongoDB básico)', 25, 10, NULL, NULL),
+(56, 'CRUD com SQL e ORM (Prisma/TypeORM)', 35, 10, NULL, NULL),
+(57, 'Relacionamentos e migrations', 30, 10, NULL, NULL),
+(58, 'Conexão Node.js ⇆ banco', 25, 10, NULL, NULL),
+(59, 'Projeto: API completa com banco real', 35, 10, NULL, NULL),
+(60, 'Módulos, controllers, services, decorators', 30, 11, NULL, NULL),
+(61, 'DTOs, Pipes, Guards', 30, 11, NULL, NULL),
+(62, 'Validação com class-validator', 25, 11, NULL, NULL),
+(63, 'Autenticação JWT', 30, 11, NULL, NULL),
+(64, 'Uploads, cache, interceptors', 30, 11, NULL, NULL),
+(65, 'Projeto: API real completa (blog, ecommerce, etc.)', 35, 11, NULL, NULL),
+(66, 'O que é uma API RESTful', 20, 12, NULL, NULL),
+(67, 'Métodos HTTP', 25, 12, NULL, NULL),
+(68, 'Boas práticas de URL', 25, 12, NULL, NULL),
+(69, 'Versionamento, status codes', 25, 12, NULL, NULL),
+(70, 'Teste com Postman/Insomnia', 25, 12, NULL, NULL),
+(71, 'Rate limiting, CORS, segurança básica', 30, 12, NULL, NULL),
+(72, 'Hash de senhas (bcrypt)', 25, 13, NULL, NULL),
+(73, 'JWT e refresh token', 30, 13, NULL, NULL),
+(74, 'Middleware de proteção', 25, 13, NULL, NULL),
+(75, 'RBAC: controle por função', 30, 13, NULL, NULL),
+(76, 'Cookies vs localStorage', 20, 13, NULL, NULL),
+(77, 'Proteção de rotas no front-end', 30, 13, NULL, NULL),
+(78, 'Deploy de front-end (Vercel, Netlify)', 25, 14, NULL, NULL),
+(79, 'Deploy de back-end (Render, Railway, EC2)', 30, 14, NULL, NULL),
+(80, 'Banco em nuvem (Supabase, PlanetScale, Neon)', 25, 14, NULL, NULL),
+(81, 'CI/CD básico com GitHub Actions', 30, 14, NULL, NULL),
+(82, 'Monitoramento e logs', 25, 14, NULL, NULL),
+(83, 'Sintaxe C#, tipos, classes, métodos', 30, 15, NULL, NULL),
+(84, 'ASP.NET Core MVC', 35, 15, NULL, NULL),
+(85, 'Entity Framework', 30, 15, NULL, NULL),
+(86, 'Web APIs em C#', 30, 15, NULL, NULL),
+(87, 'Projeto prático: API .NET com autenticação e banco', 35, 15, NULL, NULL),
+(88, 'Sintaxe Java', 30, 16, NULL, NULL),
+(89, 'Spring Boot: controllers, services, repositories', 35, 16, NULL, NULL),
+(90, 'JPA e Hibernate', 30, 16, NULL, NULL),
+(91, 'Beans, Injeção de Dependência', 30, 16, NULL, NULL),
+(92, 'Projeto prático: API Java com banco de dados', 35, 16, NULL, NULL),
+(93, 'Clean Architecture e SOLID', 30, 17, NULL, NULL),
+(94, 'Separação por camadas', 25, 17, NULL, NULL),
+(95, 'Testes unitários (Jest, JUnit)', 30, 17, NULL, NULL),
+(96, 'Testes de integração', 25, 17, NULL, NULL),
+(97, 'TDD, mocks e stubs', 30, 17, NULL, NULL),
+(98, 'Diferença entre monolito e microserviços', 25, 18, NULL, NULL),
+(99, 'Comunicação via HTTP e mensageria (RabbitMQ)', 30, 18, NULL, NULL),
+(100, 'API Gateway', 25, 18, NULL, NULL),
+(101, 'Docker + containers', 30, 18, NULL, NULL),
+(102, 'Deploy de microserviços', 30, 18, NULL, NULL),
+(103, 'Kanban, Trello, Notion', 20, 19, NULL, NULL),
+(104, 'Comunicação assíncrona', 25, 19, NULL, NULL),
+(105, 'Scrum, sprints, backlog', 30, 19, NULL, NULL),
+(106, 'Trabalho remoto produtivo', 25, 19, NULL, NULL),
+(107, 'Vocabulário de programação em inglês', 25, 20, NULL, NULL),
+(108, 'Treinamento de listening (áudios, vídeos, reuniões)', 30, 20, NULL, NULL),
+(109, 'Como se apresentar, falar de projetos', 25, 20, NULL, NULL),
+(110, 'Entrevistas técnicas: como responder perguntas comuns', 30, 20, NULL, NULL),
+(111, 'Técnicas de speaking: improviso, pronúncia, confiança', 30, 20, NULL, NULL),
+(112, 'Criação de portfólio internacional', 30, 21, NULL, NULL),
+(113, 'GitHub profissional', 25, 21, NULL, NULL),
+(114, 'Como criar um currículo em inglês', 25, 21, NULL, NULL),
+(115, 'Simulação de entrevista (mock interview)', 30, 21, NULL, NULL),
+(116, 'Onde encontrar vagas internacionais (LinkedIn, Turing, VanHack, etc.)', 30, 21, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `user`
+-- Estrutura da tabela `user`
 --
 
 CREATE TABLE `user` (
@@ -481,48 +574,71 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `user`
+-- Extraindo dados da tabela `user`
 --
 
 INSERT INTO `user` (`id`, `email`, `password`, `createdAt`, `currentStreak`, `lastActivityDate`, `longestStreak`) VALUES
-(1, 'dev@roadmap.com', '$2b$10$wdcz2YrKpOHcxZF6E7M6luPIbiaLehNxV8rAKj5Do3B5jSedaIdKe', '2025-08-11 02:45:14.417', 0, NULL, 1);
+(1, 'dev@roadmap.com', '$2b$10$wdcz2YrKpOHcxZF6E7M6luPIbiaLehNxV8rAKj5Do3B5jSedaIdKe', '2025-08-11 02:45:14.417', 1, '2025-12-28 15:27:01.156', 1);
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `userachievement`
+-- Estrutura da tabela `userachievement`
 --
 
 CREATE TABLE `userachievement` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `achievementId` int(11) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL,
   `earnedAt` datetime(3) NOT NULL DEFAULT current_timestamp(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `userachievement`
+--
+
+INSERT INTO `userachievement` (`id`, `userId`, `achievementId`, `roadmapId`, `earnedAt`) VALUES
+(91, 1, 1, 1, '2025-12-28 15:26:54.278'),
+(92, 1, 2, 1, '2025-12-28 15:26:56.321'),
+(93, 1, 3, 1, '2025-12-28 15:27:00.476'),
+(94, 1, 32, 1, '2025-12-28 15:27:00.508'),
+(95, 1, 49, 1, '2025-12-28 15:27:00.542'),
+(96, 1, 7, 1, '2025-12-28 15:27:01.189'),
+(97, 1, 42, 1, '2025-12-28 15:27:01.235');
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `userbadge`
+-- Estrutura da tabela `userbadge`
 --
 
 CREATE TABLE `userbadge` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `badgeId` int(11) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL,
   `earnedAt` datetime(3) NOT NULL DEFAULT current_timestamp(3)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `userbadge`
+--
+
+INSERT INTO `userbadge` (`id`, `userId`, `badgeId`, `roadmapId`, `earnedAt`) VALUES
+(18, 1, 1, 1, '2025-12-28 15:27:01.168');
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `userchallenge`
+-- Estrutura da tabela `userchallenge`
 --
 
 CREATE TABLE `userchallenge` (
   `id` int(11) NOT NULL,
   `challengeId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
+  `roadmapId` int(11) DEFAULT NULL,
   `completed` tinyint(1) NOT NULL DEFAULT 0,
   `completedAt` datetime(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -530,7 +646,7 @@ CREATE TABLE `userchallenge` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `usercurrency`
+-- Estrutura da tabela `usercurrency`
 --
 
 CREATE TABLE `usercurrency` (
@@ -543,7 +659,7 @@ CREATE TABLE `usercurrency` (
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `_prisma_migrations`
+-- Estrutura da tabela `_prisma_migrations`
 --
 
 CREATE TABLE `_prisma_migrations` (
@@ -558,7 +674,7 @@ CREATE TABLE `_prisma_migrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Despejando dados para a tabela `_prisma_migrations`
+-- Extraindo dados da tabela `_prisma_migrations`
 --
 
 INSERT INTO `_prisma_migrations` (`id`, `checksum`, `finished_at`, `migration_name`, `logs`, `rolled_back_at`, `started_at`, `applied_steps_count`) VALUES
@@ -573,38 +689,48 @@ INSERT INTO `_prisma_migrations` (`id`, `checksum`, `finished_at`, `migration_na
 --
 
 --
--- Índices de tabela `achievement`
+-- Índices para tabela `achievement`
 --
 ALTER TABLE `achievement`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `achievement_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `analytics`
+-- Índices para tabela `analytics`
 --
 ALTER TABLE `analytics`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Analytics_userId_fkey` (`userId`);
 
 --
--- Índices de tabela `badge`
+-- Índices para tabela `badge`
 --
 ALTER TABLE `badge`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `badge_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `challenge`
+-- Índices para tabela `challenge`
 --
 ALTER TABLE `challenge`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `challenge_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `leaderboard`
+-- Índices para tabela `file`
+--
+ALTER TABLE `file`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `file_topicId_idx` (`topicId`);
+
+--
+-- Índices para tabela `leaderboard`
 --
 ALTER TABLE `leaderboard`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `leaderboardentry`
+-- Índices para tabela `leaderboardentry`
 --
 ALTER TABLE `leaderboardentry`
   ADD PRIMARY KEY (`id`),
@@ -612,21 +738,22 @@ ALTER TABLE `leaderboardentry`
   ADD KEY `LeaderboardEntry_userId_fkey` (`userId`);
 
 --
--- Índices de tabela `level`
+-- Índices para tabela `level`
 --
 ALTER TABLE `level`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `Level_name_key` (`name`);
+  ADD UNIQUE KEY `Level_roadmapId_name_key` (`roadmapId`,`name`),
+  ADD KEY `level_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `mentor`
+-- Índices para tabela `mentor`
 --
 ALTER TABLE `mentor`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `Mentor_userId_key` (`userId`);
 
 --
--- Índices de tabela `mentorship`
+-- Índices para tabela `mentorship`
 --
 ALTER TABLE `mentorship`
   ADD PRIMARY KEY (`id`),
@@ -634,79 +761,101 @@ ALTER TABLE `mentorship`
   ADD KEY `Mentorship_menteeId_fkey` (`menteeId`);
 
 --
--- Índices de tabela `notification`
+-- Índices para tabela `notification`
 --
 ALTER TABLE `notification`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `Notification_userId_fkey` (`userId`);
+  ADD KEY `Notification_userId_fkey` (`userId`),
+  ADD KEY `notification_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `powerup`
+-- Índices para tabela `powerup`
 --
 ALTER TABLE `powerup`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `progress`
+-- Índices para tabela `progress`
 --
 ALTER TABLE `progress`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `Progress_userId_topicId_key` (`userId`,`topicId`),
-  ADD KEY `Progress_topicId_fkey` (`topicId`);
+  ADD KEY `Progress_topicId_fkey` (`topicId`),
+  ADD KEY `Progress_userId_fkey` (`userId`);
 
 --
--- Índices de tabela `topic`
+-- Índices para tabela `resource`
+--
+ALTER TABLE `resource`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `resource_topicId_idx` (`topicId`);
+
+--
+-- Índices para tabela `roadmap`
+--
+ALTER TABLE `roadmap`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `roadmap_isDefault_idx` (`isDefault`);
+
+--
+-- Índices para tabela `topic`
 --
 ALTER TABLE `topic`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Topic_levelId_fkey` (`levelId`);
 
 --
--- Índices de tabela `user`
+-- Índices para tabela `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `User_email_key` (`email`);
 
 --
--- Índices de tabela `userachievement`
+-- Índices para tabela `userachievement`
 --
 ALTER TABLE `userachievement`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UserAchievement_userId_achievementId_roadmapId_key` (`userId`,`achievementId`,`roadmapId`),
   ADD KEY `UserAchievement_userId_fkey` (`userId`),
-  ADD KEY `UserAchievement_achievementId_fkey` (`achievementId`);
+  ADD KEY `UserAchievement_achievementId_fkey` (`achievementId`),
+  ADD KEY `userachievement_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `userbadge`
+-- Índices para tabela `userbadge`
 --
 ALTER TABLE `userbadge`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UserBadge_userId_badgeId_roadmapId_key` (`userId`,`badgeId`,`roadmapId`),
   ADD KEY `UserBadge_userId_fkey` (`userId`),
-  ADD KEY `UserBadge_badgeId_fkey` (`badgeId`);
+  ADD KEY `UserBadge_badgeId_fkey` (`badgeId`),
+  ADD KEY `userbadge_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `userchallenge`
+-- Índices para tabela `userchallenge`
 --
 ALTER TABLE `userchallenge`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UserChallenge_userId_challengeId_roadmapId_key` (`userId`,`challengeId`,`roadmapId`),
   ADD KEY `UserChallenge_challengeId_fkey` (`challengeId`),
-  ADD KEY `UserChallenge_userId_fkey` (`userId`);
+  ADD KEY `UserChallenge_userId_fkey` (`userId`),
+  ADD KEY `userchallenge_roadmapId_idx` (`roadmapId`);
 
 --
--- Índices de tabela `usercurrency`
+-- Índices para tabela `usercurrency`
 --
 ALTER TABLE `usercurrency`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UserCurrency_userId_key` (`userId`);
 
 --
--- Índices de tabela `_prisma_migrations`
+-- Índices para tabela `_prisma_migrations`
 --
 ALTER TABLE `_prisma_migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT para tabelas despejadas
+-- AUTO_INCREMENT de tabelas despejadas
 --
 
 --
@@ -732,6 +881,12 @@ ALTER TABLE `badge`
 --
 ALTER TABLE `challenge`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de tabela `file`
+--
+ALTER TABLE `file`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `leaderboard`
@@ -767,7 +922,7 @@ ALTER TABLE `mentorship`
 -- AUTO_INCREMENT de tabela `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=217;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=231;
 
 --
 -- AUTO_INCREMENT de tabela `powerup`
@@ -779,7 +934,19 @@ ALTER TABLE `powerup`
 -- AUTO_INCREMENT de tabela `progress`
 --
 ALTER TABLE `progress`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+
+--
+-- AUTO_INCREMENT de tabela `resource`
+--
+ALTER TABLE `resource`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `roadmap`
+--
+ALTER TABLE `roadmap`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `topic`
@@ -797,13 +964,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de tabela `userachievement`
 --
 ALTER TABLE `userachievement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT de tabela `userbadge`
 --
 ALTER TABLE `userbadge`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de tabela `userchallenge`
@@ -818,71 +985,111 @@ ALTER TABLE `usercurrency`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Restrições para tabelas despejadas
+-- Restrições para despejos de tabelas
 --
 
 --
--- Restrições para tabelas `analytics`
+-- Limitadores para a tabela `achievement`
+--
+ALTER TABLE `achievement`
+  ADD CONSTRAINT `achievement_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `analytics`
 --
 ALTER TABLE `analytics`
   ADD CONSTRAINT `Analytics_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `leaderboardentry`
+-- Limitadores para a tabela `badge`
+--
+ALTER TABLE `badge`
+  ADD CONSTRAINT `badge_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `challenge`
+--
+ALTER TABLE `challenge`
+  ADD CONSTRAINT `challenge_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `file`
+--
+ALTER TABLE `file`
+  ADD CONSTRAINT `file_topicId_fkey` FOREIGN KEY (`topicId`) REFERENCES `topic` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `leaderboardentry`
 --
 ALTER TABLE `leaderboardentry`
   ADD CONSTRAINT `LeaderboardEntry_leaderboardId_fkey` FOREIGN KEY (`leaderboardId`) REFERENCES `leaderboard` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `LeaderboardEntry_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `mentorship`
+-- Limitadores para a tabela `level`
+--
+ALTER TABLE `level`
+  ADD CONSTRAINT `level_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `mentorship`
 --
 ALTER TABLE `mentorship`
   ADD CONSTRAINT `Mentorship_menteeId_fkey` FOREIGN KEY (`menteeId`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `Mentorship_mentorId_fkey` FOREIGN KEY (`mentorId`) REFERENCES `mentor` (`id`) ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `notification`
+-- Limitadores para a tabela `notification`
 --
 ALTER TABLE `notification`
-  ADD CONSTRAINT `Notification_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `Notification_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `notification_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `progress`
+-- Limitadores para a tabela `progress`
 --
 ALTER TABLE `progress`
   ADD CONSTRAINT `Progress_topicId_fkey` FOREIGN KEY (`topicId`) REFERENCES `topic` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `Progress_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `topic`
+-- Limitadores para a tabela `resource`
+--
+ALTER TABLE `resource`
+  ADD CONSTRAINT `resource_topicId_fkey` FOREIGN KEY (`topicId`) REFERENCES `topic` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `topic`
 --
 ALTER TABLE `topic`
   ADD CONSTRAINT `Topic_levelId_fkey` FOREIGN KEY (`levelId`) REFERENCES `level` (`id`) ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `userachievement`
+-- Limitadores para a tabela `userachievement`
 --
 ALTER TABLE `userachievement`
   ADD CONSTRAINT `UserAchievement_achievementId_fkey` FOREIGN KEY (`achievementId`) REFERENCES `achievement` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `UserAchievement_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `UserAchievement_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `userachievement_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `userbadge`
+-- Limitadores para a tabela `userbadge`
 --
 ALTER TABLE `userbadge`
   ADD CONSTRAINT `UserBadge_badgeId_fkey` FOREIGN KEY (`badgeId`) REFERENCES `badge` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `UserBadge_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `UserBadge_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `userbadge_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `userchallenge`
+-- Limitadores para a tabela `userchallenge`
 --
 ALTER TABLE `userchallenge`
   ADD CONSTRAINT `UserChallenge_challengeId_fkey` FOREIGN KEY (`challengeId`) REFERENCES `challenge` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `UserChallenge_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `UserChallenge_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `userchallenge_roadmapId_fkey` FOREIGN KEY (`roadmapId`) REFERENCES `roadmap` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Restrições para tabelas `usercurrency`
+-- Limitadores para a tabela `usercurrency`
 --
 ALTER TABLE `usercurrency`
   ADD CONSTRAINT `UserCurrency_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;

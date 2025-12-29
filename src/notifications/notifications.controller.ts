@@ -9,6 +9,7 @@ import {
 	UseGuards,
 	ParseIntPipe,
 	Version,
+	Query,
 } from "@nestjs/common";
 import { NotificationsService } from "./notifications.service";
 import { CreateNotificationDto } from "./dto/create-notification.dto";
@@ -43,8 +44,12 @@ export class NotificationsController {
 	@Version("1")
 	@ApiOperation({ summary: "Buscar notificações do usuário" })
 	@ApiResponse({ status: 200, description: "Notificações do usuário" })
-	findByUser(@Param("userId", ParseIntPipe) userId: number) {
-		return this.notificationsService.findByUser(userId);
+	findByUser(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.notificationsService.findByUser(userId, roadmapIdNum);
 	}
 
 	@Get(":id")
@@ -87,23 +92,35 @@ export class NotificationsController {
 	@Version("1")
 	@ApiOperation({ summary: "Marcar todas as notificações do usuário como lidas" })
 	@ApiResponse({ status: 200, description: "Notificações marcadas como lidas" })
-	markAllAsRead(@Param("userId", ParseIntPipe) userId: number) {
-		return this.notificationsService.markAllAsRead(userId);
+	markAllAsRead(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.notificationsService.markAllAsRead(userId, roadmapIdNum);
 	}
 
 	@Get("user/:userId/unread-count")
 	@Version("1")
 	@ApiOperation({ summary: "Contar notificações não lidas do usuário" })
 	@ApiResponse({ status: 200, description: "Contagem de notificações não lidas" })
-	getUnreadCount(@Param("userId", ParseIntPipe) userId: number) {
-		return this.notificationsService.getUnreadCount(userId);
+	getUnreadCount(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.notificationsService.getUnreadCount(userId, roadmapIdNum);
 	}
 
 	@Delete("user/:userId/clear")
 	@Version("1")
 	@ApiOperation({ summary: "Limpar todas as notificações do usuário" })
 	@ApiResponse({ status: 200, description: "Todas as notificações foram removidas" })
-	clearAllByUser(@Param("userId", ParseIntPipe) userId: number) {
-		return this.notificationsService.clearAllByUser(userId);
+	clearAllByUser(
+		@Param("userId", ParseIntPipe) userId: number,
+		@Query("roadmapId") roadmapId?: string,
+	) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.notificationsService.clearAllByUser(userId, roadmapIdNum);
 	}
 }
