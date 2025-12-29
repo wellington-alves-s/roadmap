@@ -1,14 +1,11 @@
 # Dockerfile para Roadmap App - EasyPanel Deploy
-# Baseado em Node.js 20 Debian Slim para compatibilidade com Prisma
+# Baseado em Node.js 20 Alpine para máxima eficiência
 
 # Estágio de build
-FROM node:20-slim AS builder
+FROM node:20-alpine AS builder
 
 # Instalar dependências do sistema (incluindo OpenSSL para Prisma)
-RUN apt-get update && apt-get install -y \
-    openssl \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache libc6-compat openssl1.1-compat
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -53,14 +50,10 @@ RUN if [ ! -f "dist/main.js" ]; then \
     fi
 
 # Estágio de produção
-FROM node:20-slim AS production
+FROM node:20-alpine AS production
 
 # Instalar dependências do sistema (incluindo OpenSSL para Prisma)
-RUN apt-get update && apt-get install -y \
-    dumb-init \
-    openssl \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache dumb-init openssl1.1-compat
 
 # Criar usuário não-root para segurança
 RUN addgroup --system --gid 1001 nodejs
