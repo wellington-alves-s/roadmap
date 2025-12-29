@@ -89,6 +89,15 @@ async function bootstrap() {
 		prefix: "/uploads/",
 	});
 
+	// Middleware para tratar acesso incorreto via /3003 (causado por proxy reverso mal configurado)
+	app.use((req, res, next) => {
+		// Se alguém acessar /3003 (como caminho, não porta), redireciona para /
+		if (req.path === "/3003") {
+			return res.redirect("/");
+		}
+		next();
+	});
+
 	// Middleware para servir o frontend na raiz
 	app.use((req, res, next) => {
 		if (req.path === "/" || req.path === "/index.html") {
