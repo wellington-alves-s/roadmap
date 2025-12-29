@@ -1,8 +1,8 @@
 # Dockerfile para Roadmap App - EasyPanel Deploy
-# Baseado em Node.js 18 Alpine para máxima eficiência
+# Baseado em Node.js 20 Alpine para máxima eficiência
 
 # Estágio de build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Instalar dependências do sistema
 RUN apk add --no-cache libc6-compat
@@ -50,7 +50,7 @@ RUN if [ ! -f "dist/main.js" ]; then \
     fi
 
 # Estágio de produção
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Instalar dependências do sistema
 RUN apk add --no-cache dumb-init
