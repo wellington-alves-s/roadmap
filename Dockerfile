@@ -5,7 +5,7 @@
 FROM node:20-alpine AS builder
 
 # Instalar dependências do sistema (incluindo OpenSSL para Prisma)
-RUN apk add --no-cache libc6-compat openssl1.1-compat
+RUN apk add --no-cache libc6-compat openssl
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -53,7 +53,7 @@ RUN if [ ! -f "dist/main.js" ]; then \
 FROM node:20-alpine AS production
 
 # Instalar dependências do sistema (incluindo OpenSSL para Prisma)
-RUN apk add --no-cache dumb-init openssl1.1-compat
+RUN apk add --no-cache dumb-init openssl
 
 # Criar usuário não-root para segurança
 RUN addgroup --system --gid 1001 nodejs
