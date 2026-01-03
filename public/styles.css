@@ -93,6 +93,7 @@ body {
 .sidebar-header {
 	padding: 20px;
 	border-bottom: 1px solid var(--border-color);
+	flex-shrink: 0;
 }
 
 .brand {
@@ -113,6 +114,7 @@ body {
 .roadmap-selector-container {
 	margin-bottom: 15px;
 	padding: 0 10px;
+	flex-shrink: 0;
 }
 
 .roadmap-selector-label {
@@ -191,9 +193,12 @@ body {
 .sidebar-nav {
 	padding: 20px 10px;
 	flex: 1;
+	min-height: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .sidebar-btn {
@@ -236,6 +241,7 @@ body {
 .sidebar-footer {
 	padding: 20px;
 	border-top: 1px solid var(--border-color);
+	flex-shrink: 0;
 }
 
 .user-info {
@@ -252,6 +258,12 @@ body {
 .btn-group {
 	display: flex;
 	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.btn-group .btn-sm {
+	flex: 1;
+	min-width: 0;
 }
 
 .btn-sm {
@@ -1031,6 +1043,8 @@ body {
 @media (max-width: 768px) {
 	.sidebar {
 		transform: translateX(-100%);
+		max-height: 100vh;
+		overflow: hidden;
 	}
 
 	.sidebar.active {
@@ -1043,6 +1057,25 @@ body {
 
 	.sidebar-overlay.active {
 		display: block;
+	}
+
+	.sidebar-footer {
+		padding: 15px;
+	}
+
+	.user-info {
+		gap: 10px;
+	}
+
+	.btn-group {
+		width: 100%;
+	}
+
+	.btn-group .btn-sm {
+		flex: 1;
+		min-width: 80px;
+		font-size: 0.8rem;
+		padding: 8px 10px;
 	}
 
 	.main-content {
@@ -3452,6 +3485,29 @@ Funcionalidade: ✅ 100% OPERACIONAL
 }
 
 @media (max-width: 480px) {
+	.sidebar-footer {
+		padding: 12px;
+	}
+
+	.user-info {
+		gap: 8px;
+	}
+
+	.user-info span {
+		font-size: 0.75rem;
+	}
+
+	.btn-group {
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.btn-group .btn-sm {
+		width: 100%;
+		font-size: 0.75rem;
+		padding: 10px;
+	}
+
 	.challenges-stats {
 		grid-template-columns: 1fr;
 	}
