@@ -82,12 +82,14 @@ body {
 	top: 0;
 	width: 280px;
 	height: 100vh;
+	max-height: 100vh;
 	background: var(--bg-secondary);
 	border-right: 1px solid var(--border-color);
 	display: flex;
 	flex-direction: column;
 	transition: all 0.3s ease;
 	z-index: 1000;
+	overflow: hidden;
 }
 
 .sidebar-header {
@@ -242,6 +244,8 @@ body {
 	padding: 20px;
 	border-top: 1px solid var(--border-color);
 	flex-shrink: 0;
+	margin-top: auto;
+	background: var(--bg-secondary);
 }
 
 .user-info {
@@ -263,7 +267,8 @@ body {
 
 .btn-group .btn-sm {
 	flex: 1;
-	min-width: 0;
+	min-width: 60px;
+	width: auto;
 }
 
 .btn-sm {
@@ -271,6 +276,9 @@ body {
 	font-size: 0.875rem;
 	border-radius: var(--border-radius-sm);
 	cursor: pointer;
+	width: auto;
+	min-width: 60px;
+	display: inline-flex;
 }
 
 .btn-danger {
@@ -279,10 +287,21 @@ body {
 	border: none;
 }
 
+.btn-danger:hover {
+	background: #dc2626;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
 .btn-secondary {
 	background: var(--bg-hover);
 	color: var(--text-primary);
 	border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+	background: var(--bg-active);
+	border-color: var(--accent-primary);
 }
 
 /* Menu Toggle Button */
@@ -1045,6 +1064,8 @@ body {
 		transform: translateX(-100%);
 		max-height: 100vh;
 		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.sidebar.active {
@@ -1059,16 +1080,32 @@ body {
 		display: block;
 	}
 
+	.sidebar-nav {
+		overflow-y: auto;
+		overflow-x: hidden;
+		flex: 1;
+		min-height: 0;
+	}
+
 	.sidebar-footer {
 		padding: 15px;
+		flex-shrink: 0;
+		margin-top: auto;
+		background: var(--bg-secondary);
+		position: relative;
+		z-index: 10;
 	}
 
 	.user-info {
 		gap: 10px;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.btn-group {
 		width: 100%;
+		display: flex;
+		gap: 8px;
 	}
 
 	.btn-group .btn-sm {
@@ -1076,6 +1113,8 @@ body {
 		min-width: 80px;
 		font-size: 0.8rem;
 		padding: 8px 10px;
+		display: inline-flex;
+		width: auto;
 	}
 
 	.main-content {
@@ -3485,12 +3524,34 @@ Funcionalidade: ✅ 100% OPERACIONAL
 }
 
 @media (max-width: 480px) {
+	.sidebar {
+		display: flex;
+		flex-direction: column;
+		max-height: 100vh;
+		overflow: hidden;
+	}
+
+	.sidebar-nav {
+		overflow-y: auto;
+		overflow-x: hidden;
+		flex: 1;
+		min-height: 0;
+	}
+
 	.sidebar-footer {
 		padding: 12px;
+		flex-shrink: 0;
+		margin-top: auto;
+		background: var(--bg-secondary);
+		position: relative;
+		z-index: 10;
+		border-top: 1px solid var(--border-color);
 	}
 
 	.user-info {
 		gap: 8px;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.user-info span {
@@ -3498,14 +3559,19 @@ Funcionalidade: ✅ 100% OPERACIONAL
 	}
 
 	.btn-group {
-		flex-direction: column;
+		flex-direction: row;
 		gap: 6px;
+		width: 100%;
+		display: flex;
 	}
 
 	.btn-group .btn-sm {
-		width: 100%;
+		flex: 1;
+		min-width: 70px;
 		font-size: 0.75rem;
-		padding: 10px;
+		padding: 10px 8px;
+		display: inline-flex;
+		width: auto;
 	}
 
 	.challenges-stats {
