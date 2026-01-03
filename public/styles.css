@@ -194,13 +194,16 @@ body {
 
 .sidebar-nav {
 	padding: 20px 10px;
-	flex: 1;
+	flex: 1 1 auto;
 	min-height: 0;
+	max-height: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	overflow-y: auto;
 	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: var(--bg-hover) var(--bg-secondary);
 }
 
 .sidebar-btn {
@@ -244,8 +247,14 @@ body {
 	padding: 20px;
 	border-top: 1px solid var(--border-color);
 	flex-shrink: 0;
-	margin-top: auto;
+	flex-grow: 0;
 	background: var(--bg-secondary);
+	position: relative;
+	z-index: 5;
+	min-height: 120px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
 }
 
 .user-info {
@@ -1083,17 +1092,23 @@ body {
 	.sidebar-nav {
 		overflow-y: auto;
 		overflow-x: hidden;
-		flex: 1;
+		flex: 1 1 auto;
 		min-height: 0;
+		max-height: 100%;
 	}
 
 	.sidebar-footer {
 		padding: 15px;
 		flex-shrink: 0;
-		margin-top: auto;
+		flex-grow: 0;
 		background: var(--bg-secondary);
 		position: relative;
 		z-index: 10;
+		border-top: 1px solid var(--border-color);
+		min-height: 100px;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
 	}
 
 	.user-info {
@@ -3534,18 +3549,23 @@ Funcionalidade: ✅ 100% OPERACIONAL
 	.sidebar-nav {
 		overflow-y: auto;
 		overflow-x: hidden;
-		flex: 1;
+		flex: 1 1 auto;
 		min-height: 0;
+		max-height: 100%;
 	}
 
 	.sidebar-footer {
 		padding: 12px;
 		flex-shrink: 0;
-		margin-top: auto;
+		flex-grow: 0;
 		background: var(--bg-secondary);
 		position: relative;
 		z-index: 10;
 		border-top: 1px solid var(--border-color);
+		min-height: 100px;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
 	}
 
 	.user-info {
