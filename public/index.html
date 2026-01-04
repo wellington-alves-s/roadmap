@@ -731,6 +731,14 @@ Status: ✅ APROVADO PELO USUÁRIO
 								<p class="empty-message">Selecione um roadmap para gerenciar suas conquistas.</p>
 							</div>
 						</div>
+						
+						<div class="admin-card">
+							<h3><i class="fas fa-medal"></i> Badges do Roadmap</h3>
+							<p>Gerencie os badges do roadmap selecionado</p>
+							<div id="roadmapBadgesContainer" class="admin-list">
+								<p class="empty-message">Selecione um roadmap para gerenciar seus badges.</p>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -1028,6 +1036,65 @@ Status: ✅ APROVADO PELO USUÁRIO
 					</div>
 					<div class="modal-actions">
 						<button type="button" class="btn btn-secondary" onclick="closeEditAchievementModal()">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-save"></i>
+							Salvar
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Modal de Criação/Edição de Badge -->
+		<div id="editBadgeModal" class="modal" style="display: none">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3><i class="fas fa-medal"></i> <span id="editBadgeModalTitle">Criar Badge</span></h3>
+					<button class="close-btn" onclick="closeEditBadgeModal()">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<form id="editBadgeForm" class="modal-form">
+					<input type="hidden" id="editBadgeId" name="id" />
+					<input type="hidden" id="editBadgeRoadmapId" name="roadmapId" />
+					<div class="form-group">
+						<label for="editBadgeName">Nome do Badge:</label>
+						<input type="text" id="editBadgeName" name="name" required 
+							placeholder="Ex: Nível 1 — Fundamentos da Web e da Internet" />
+					</div>
+					<div class="form-group">
+						<label for="editBadgeDescription">Descrição:</label>
+						<textarea id="editBadgeDescription" name="description" rows="3" required
+							placeholder="Ex: Conquistou o conhecimento fundamental de como a internet funciona por trás dos navegadores."></textarea>
+					</div>
+					<div class="form-group">
+						<label for="editBadgeIcon">Ícone (Emoji):</label>
+						<div style="display: flex; gap: 10px; align-items: center;">
+							<input type="text" id="editBadgeIcon" name="icon" required 
+								placeholder="🌐" maxlength="2" style="font-size: 2rem; text-align: center; width: 80px;" />
+							<div style="flex: 1;">
+								<small style="color: var(--text-muted);">
+									Digite um emoji ou escolha: 🌐 🧱 🎨 🧬 🧠 🪄 🛡️ ⚛️ 🚀 💾 🗄️ 🔐 🌍 🗣️ 🧳
+								</small>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="editBadgeCategory">Categoria:</label>
+						<select id="editBadgeCategory" name="category" required>
+							<option value="level">Level (Nível)</option>
+							<option value="achievement">Achievement (Conquista)</option>
+							<option value="special">Special (Especial)</option>
+							<option value="milestone">Milestone (Marco)</option>
+						</select>
+						<small style="color: var(--text-muted);">
+							Categoria do badge. "Level" é usado para badges automáticos ao completar níveis.
+						</small>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-secondary" onclick="closeEditBadgeModal()">
 							Cancelar
 						</button>
 						<button type="submit" class="btn btn-primary">

@@ -1,5 +1,7 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { CreateBadgeDto } from "./dto/create-badge.dto";
+import { UpdateBadgeDto } from "./dto/update-badge.dto";
 
 @Injectable()
 export class BadgesService {
@@ -7,8 +9,30 @@ export class BadgesService {
 
 	constructor(private prisma: PrismaService) {}
 
-	async findAll() {
+	async create(createBadgeDto: CreateBadgeDto) {
+		this.logger.log("Creating new badge");
+
+		// Validar se o roadmap existe (se roadmapId foi fornecido)
+		if (createBadgeDto.roadmapId) {
+			const roadmap = await this.prisma.roadmap.findUnique({
+				where: { id: createBadgeDto.roadmapId },
+			});
+
+			if (!roadmap) {
+				throw new NotFoundException(
+					`Roadmap com ID ${createBadgeDto.roadmapId} não encontrado`,
+				);
+			}
+		}
+
+		return this.prisma.badge.create({
+			data: createBadgeDto,
+		});
+	}
+
+	async findAll(roadmapId?: number) {
 		return this.prisma.badge.findMany({
+			where: roadmapId ? { roadmapId } : undefined,
 			include: {
 				_count: {
 					select: {
@@ -16,6 +40,51 @@ export class BadgesService {
 					},
 				},
 			},
+			orderBy: {
+				id: "asc",
+			},
+		});
+	}
+
+	async update(id: number, updateBadgeDto: UpdateBadgeDto) {
+		const badge = await this.prisma.badge.findUnique({
+			where: { id },
+		});
+
+		if (!badge) {
+			throw new NotFoundException("Badge não encontrado");
+		}
+
+		// Validar se o roadmap existe (se roadmapId foi fornecido)
+		if (updateBadgeDto.roadmapId) {
+			const roadmap = await this.prisma.roadmap.findUnique({
+				where: { id: updateBadgeDto.roadmapId },
+			});
+
+			if (!roadmap) {
+				throw new NotFoundException(
+					`Roadmap com ID ${updateBadgeDto.roadmapId} não encontrado`,
+				);
+			}
+		}
+
+		return this.prisma.badge.update({
+			where: { id },
+			data: updateBadgeDto,
+		});
+	}
+
+	async remove(id: number) {
+		const badge = await this.prisma.badge.findUnique({
+			where: { id },
+		});
+
+		if (!badge) {
+			throw new NotFoundException("Badge não encontrado");
+		}
+
+		return this.prisma.badge.delete({
+			where: { id },
 		});
 	}
 

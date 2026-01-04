@@ -4184,6 +4184,9 @@ function renderRoadmapsList(roadmapsData) {
 					<button class="btn btn-success btn-sm" onclick="handleManageRoadmapAchievements(${roadmap.id}, '${roadmap.name.replace(/'/g, "\\'")}')" title="Gerenciar conquistas">
 						<i class="fas fa-trophy"></i> Conquistas
 					</button>
+					<button class="btn btn-warning btn-sm" onclick="handleManageRoadmapBadges(${roadmap.id}, '${roadmap.name.replace(/'/g, "\\'")}')" title="Gerenciar badges">
+						<i class="fas fa-medal"></i> Badges
+					</button>
 					${
 						isCurrent
 							? `
@@ -4686,6 +4689,307 @@ async function handleSaveAchievement(e) {
 	} catch (error) {
 		console.error("❌ Erro ao salvar conquista:", error);
 		showError("Erro de conexão ao salvar conquista");
+	} finally {
+		hideLoading();
+	}
+}
+
+// ==================== FUNÇÕES DE BADGES ====================
+
+let currentManagingBadgesRoadmapId = null;
+
+window.handleManageRoadmapBadges = async function (roadmapId, roadmapName) {
+	console.log("🏅 Gerenciando badges do roadmap:", roadmapId, roadmapName);
+	currentManagingBadgesRoadmapId = roadmapId;
+	
+	// Atualizar título do container
+	const container = document.getElementById("roadmapBadgesContainer");
+	if (container) {
+		container.innerHTML = `
+			<div style="margin-bottom: 15px;">
+				<h4 style="margin-bottom: 10px;">Badges de: ${roadmapName}</h4>
+				<button class="btn btn-primary btn-sm" onclick="handleCreateBadge(${roadmapId})" style="margin-bottom: 15px;">
+					<i class="fas fa-plus"></i> Criar Novo Badge
+				</button>
+			</div>
+			<div id="roadmapBadgesList" class="admin-list">
+				<p>Carregando badges...</p>
+			</div>
+		`;
+	}
+	
+	// Carregar badges do roadmap
+	await loadRoadmapBadges(roadmapId);
+};
+
+async function loadRoadmapBadges(roadmapId) {
+	console.log("🔄 Carregando badges do roadmap:", roadmapId);
+	
+	const listContainer = document.getElementById("roadmapBadgesList");
+	if (!listContainer) {
+		console.error("❌ Container de badges não encontrado");
+		return;
+	}
+	
+	try {
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/badges?roadmapId=${roadmapId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok) {
+			const badges = await response.json();
+			console.log("✅ Badges carregados:", badges.length);
+			
+			if (badges.length === 0) {
+				listContainer.innerHTML = `
+					<p class="empty-message">Nenhum badge cadastrado para este roadmap.</p>
+				`;
+			} else {
+				listContainer.innerHTML = badges
+					.map((badge) => {
+						return `
+						<div class="admin-item">
+							<div class="admin-item-info">
+								<h4>
+									<span style="font-size: 1.5rem; margin-right: 10px;">${badge.icon || "🏅"}</span>
+									${badge.name}
+								</h4>
+								<p class="admin-item-meta">
+									${badge.description}
+									<br>
+									<small style="color: var(--text-muted);">
+										Categoria: ${badge.category || "N/A"}
+										${badge._count ? ` • Usuários: ${badge._count.userbadge || 0}` : ""}
+									</small>
+								</p>
+							</div>
+							<div class="admin-item-actions">
+								<button class="btn btn-primary btn-sm" onclick="handleEditBadge(${badge.id}, ${roadmapId})" title="Editar badge">
+									<i class="fas fa-edit"></i> Editar
+								</button>
+								<button class="btn btn-danger btn-sm" onclick="handleDeleteBadge(${badge.id}, ${roadmapId}, '${badge.name.replace(/'/g, "\\'")}')" title="Excluir badge">
+									<i class="fas fa-trash"></i> Excluir
+								</button>
+							</div>
+						</div>
+					`;
+					})
+					.join("");
+			}
+		} else {
+			const errorText = await response.text();
+			console.error("❌ Erro ao carregar badges:", response.status, errorText);
+			listContainer.innerHTML = `
+				<p class="empty-message" style="color: var(--error);">
+					Erro ao carregar badges: ${errorText}
+				</p>
+			`;
+		}
+	} catch (error) {
+		console.error("❌ Erro ao carregar badges:", error);
+		if (listContainer) {
+			listContainer.innerHTML = `
+				<p class="empty-message" style="color: var(--error);">
+					Erro de conexão ao carregar badges.
+				</p>
+			`;
+		}
+	}
+}
+
+window.handleCreateBadge = function (roadmapId) {
+	console.log("➕ Criando novo badge para roadmap:", roadmapId);
+	
+	// Limpar formulário
+	document.getElementById("editBadgeId").value = "";
+	document.getElementById("editBadgeRoadmapId").value = roadmapId;
+	document.getElementById("editBadgeName").value = "";
+	document.getElementById("editBadgeDescription").value = "";
+	document.getElementById("editBadgeIcon").value = "";
+	document.getElementById("editBadgeCategory").value = "level";
+	
+	// Atualizar título do modal
+	document.getElementById("editBadgeModalTitle").textContent = "Criar Badge";
+	
+	// Mostrar modal
+	const modal = document.getElementById("editBadgeModal");
+	if (modal) {
+		modal.style.display = "flex";
+	}
+};
+
+window.handleEditBadge = async function (badgeId, roadmapId) {
+	console.log("✏️ Editando badge:", badgeId);
+	
+	try {
+		showLoading();
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/badges/${badgeId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok) {
+			const badge = await response.json();
+			
+			// Preencher formulário
+			document.getElementById("editBadgeId").value = badge.id;
+			document.getElementById("editBadgeRoadmapId").value = roadmapId;
+			document.getElementById("editBadgeName").value = badge.name || "";
+			document.getElementById("editBadgeDescription").value = badge.description || "";
+			document.getElementById("editBadgeIcon").value = badge.icon || "";
+			document.getElementById("editBadgeCategory").value = badge.category || "level";
+			
+			// Atualizar título do modal
+			document.getElementById("editBadgeModalTitle").textContent = "Editar Badge";
+			
+			// Mostrar modal
+			const modal = document.getElementById("editBadgeModal");
+			if (modal) {
+				modal.style.display = "flex";
+			}
+		} else {
+			const errorText = await response.text();
+			showError(`Erro ao carregar badge: ${errorText}`);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao carregar badge:", error);
+		showError("Erro de conexão ao carregar badge.");
+	} finally {
+		hideLoading();
+	}
+};
+
+window.handleDeleteBadge = async function (badgeId, roadmapId, badgeName) {
+	if (!confirm(`Tem certeza que deseja excluir o badge "${badgeName}"?`)) {
+		return;
+	}
+	
+	showLoading();
+	
+	try {
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/badges/${badgeId}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok) {
+			showSuccess("Badge excluído com sucesso!");
+			
+			// Recarregar lista de badges
+			if (currentManagingBadgesRoadmapId) {
+				await loadRoadmapBadges(currentManagingBadgesRoadmapId);
+			}
+		} else {
+			const errorText = await response.text();
+			showError(`Erro ao excluir badge: ${errorText}`);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao excluir badge:", error);
+		showError("Erro de conexão ao excluir badge.");
+	} finally {
+		hideLoading();
+	}
+};
+
+window.closeEditBadgeModal = function () {
+	const modal = document.getElementById("editBadgeModal");
+	if (modal) {
+		modal.style.display = "none";
+	}
+};
+
+// Event listener para o formulário de badge
+if (typeof document !== "undefined") {
+	// Aguardar DOM estar pronto
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", setupBadgeForm);
+	} else {
+		setupBadgeForm();
+	}
+}
+
+function setupBadgeForm() {
+	const badgeForm = document.getElementById("editBadgeForm");
+	if (badgeForm) {
+		badgeForm.addEventListener("submit", handleSaveBadge);
+	}
+	
+	// Fechar modal ao clicar fora
+	const badgeModal = document.getElementById("editBadgeModal");
+	if (badgeModal) {
+		badgeModal.addEventListener("click", function (e) {
+			if (e.target === badgeModal) {
+				closeEditBadgeModal();
+			}
+		});
+	}
+}
+
+async function handleSaveBadge(e) {
+	e.preventDefault();
+	
+	const formData = {
+		id: document.getElementById("editBadgeId").value,
+		roadmapId: parseInt(document.getElementById("editBadgeRoadmapId").value),
+		name: document.getElementById("editBadgeName").value.trim(),
+		description: document.getElementById("editBadgeDescription").value.trim(),
+		icon: document.getElementById("editBadgeIcon").value.trim(),
+		category: document.getElementById("editBadgeCategory").value,
+	};
+	
+	if (!formData.name || !formData.description || !formData.icon || !formData.category) {
+		showError("Por favor, preencha todos os campos obrigatórios.");
+		return;
+	}
+	
+	showLoading();
+	
+	try {
+		const token = localStorage.getItem("token");
+		const isEdit = formData.id && formData.id !== "";
+		const url = isEdit
+			? `${API_BASE_URL}/api/v1/badges/${formData.id}`
+			: `${API_BASE_URL}/api/v1/badges`;
+		const method = isEdit ? "PATCH" : "POST";
+		
+		// Remover id do payload se for criação
+		const payload = { ...formData };
+		if (!isEdit) {
+			delete payload.id;
+		}
+		
+		const response = await fetch(url, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(payload),
+		});
+		
+		if (response.ok) {
+			showSuccess(isEdit ? "Badge atualizado com sucesso!" : "Badge criado com sucesso!");
+			closeEditBadgeModal();
+			
+			// Recarregar lista de badges
+			if (currentManagingBadgesRoadmapId) {
+				await loadRoadmapBadges(currentManagingBadgesRoadmapId);
+			}
+		} else {
+			const errorText = await response.text();
+			showError(`Erro ao salvar badge: ${errorText}`);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao salvar badge:", error);
+		showError("Erro de conexão ao salvar badge.");
 	} finally {
 		hideLoading();
 	}
