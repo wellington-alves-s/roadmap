@@ -195,7 +195,7 @@ body {
 }
 
 .sidebar-nav {
-	padding: 1px 10px;
+	padding: 5px 10px;
 	flex: 1 1 auto;
 	min-height: 0;
 	max-height: calc(100vh - 250px);
@@ -247,7 +247,7 @@ body {
 }
 
 .sidebar-footer {
-	padding: 15px 20px;
+	padding: 10px;
 	border-top: 1px solid var(--border-color);
 	flex-shrink: 0;
 	flex-grow: 0;
@@ -1110,7 +1110,7 @@ body {
 	}
 
 	.sidebar-footer {
-		padding: 15px;
+		padding: 10px;
 		flex-shrink: 0;
 		flex-grow: 0;
 		background: var(--bg-secondary);
@@ -3572,7 +3572,7 @@ Funcionalidade: ✅ 100% OPERACIONAL
 	}
 
 	.sidebar-footer {
-		padding: 12px;
+		padding: 10px;
 		flex-shrink: 0;
 		flex-grow: 0;
 		background: var(--bg-secondary);
