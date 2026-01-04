@@ -13,19 +13,36 @@ export class AchievementsService {
 	async create(createAchievementDto: CreateAchievementDto) {
 		this.logger.log("Creating new achievement");
 
+		// Validar se o roadmap existe (se roadmapId foi fornecido)
+		if (createAchievementDto.roadmapId) {
+			const roadmap = await this.prisma.roadmap.findUnique({
+				where: { id: createAchievementDto.roadmapId },
+			});
+
+			if (!roadmap) {
+				throw new NotFoundException(
+					`Roadmap com ID ${createAchievementDto.roadmapId} não encontrado`,
+				);
+			}
+		}
+
 		return this.prisma.achievement.create({
 			data: createAchievementDto,
 		});
 	}
 
-	async findAll() {
+	async findAll(roadmapId?: number) {
 		return this.prisma.achievement.findMany({
+			where: roadmapId ? { roadmapId } : undefined,
 			include: {
 				_count: {
 					select: {
 						userachievement: true,
 					},
 				},
+			},
+			orderBy: {
+				id: "asc",
 			},
 		});
 	}

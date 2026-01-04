@@ -42,4 +42,13 @@ export class CreateAchievementDto {
 	@IsNumber({}, { message: "XP recompensa deve ser um número" })
 	@IsOptional()
 	xpReward?: number;
+
+	@ApiProperty({
+		description: "ID do roadmap (opcional)",
+		example: 1,
+		required: false,
+	})
+	@IsNumber({}, { message: "Roadmap ID deve ser um número" })
+	@IsOptional()
+	roadmapId?: number;
 }

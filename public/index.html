@@ -723,6 +723,14 @@ Status: ✅ APROVADO PELO USUÁRIO
 								<!-- Lista de roadmaps será carregada aqui -->
 							</div>
 						</div>
+						
+						<div class="admin-card">
+							<h3><i class="fas fa-trophy"></i> Conquistas do Roadmap</h3>
+							<p>Gerencie as conquistas do roadmap selecionado</p>
+							<div id="roadmapAchievementsContainer" class="admin-list">
+								<p class="empty-message">Selecione um roadmap para gerenciar suas conquistas.</p>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -958,6 +966,68 @@ Status: ✅ APROVADO PELO USUÁRIO
 					</div>
 					<div class="modal-actions">
 						<button type="button" class="btn btn-secondary" onclick="closeEditRoadmapModal()">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-save"></i>
+							Salvar
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Modal de Criação/Edição de Conquista -->
+		<div id="editAchievementModal" class="modal" style="display: none">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3><i class="fas fa-trophy"></i> <span id="editAchievementModalTitle">Criar Conquista</span></h3>
+					<button class="close-btn" onclick="closeEditAchievementModal()">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<form id="editAchievementForm" class="modal-form">
+					<input type="hidden" id="editAchievementId" name="id" />
+					<input type="hidden" id="editAchievementRoadmapId" name="roadmapId" />
+					<div class="form-group">
+						<label for="editAchievementName">Nome da Conquista:</label>
+						<input type="text" id="editAchievementName" name="name" required 
+							placeholder="Ex: Primeiro Passo" />
+					</div>
+					<div class="form-group">
+						<label for="editAchievementDescription">Descrição:</label>
+						<textarea id="editAchievementDescription" name="description" rows="3" required
+							placeholder="Ex: Complete seu primeiro tópico"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="editAchievementIcon">Ícone (Emoji):</label>
+						<div style="display: flex; gap: 10px; align-items: center;">
+							<input type="text" id="editAchievementIcon" name="icon" required 
+								placeholder="🏆" maxlength="2" style="font-size: 2rem; text-align: center; width: 80px;" />
+							<div style="flex: 1;">
+								<small style="color: var(--text-muted);">
+									Digite um emoji ou escolha: 🏆 🎯 📚 👑 🔥 💎 🎓 💪 ⚡ 🚀 🌟 🏅 🥇 🥉 🎖️
+								</small>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="editAchievementXpReward">XP Recompensa:</label>
+						<input type="number" id="editAchievementXpReward" name="xpReward" min="0" value="0" required />
+					</div>
+					<div class="form-group">
+						<label for="editAchievementCondition">Condições (JSON):</label>
+						<textarea id="editAchievementCondition" name="condition" rows="4" required
+							placeholder='[{"type": "topics_completed", "value": 1}]'></textarea>
+						<small style="color: var(--text-muted);">
+							Formato JSON. Exemplos:<br>
+							• Tópicos completados: <code>[{"type": "topics_completed", "value": 1}]</code><br>
+							• XP total: <code>[{"type": "total_xp", "value": 1000}]</code><br>
+							• Streak: <code>[{"type": "streak_days", "value": 7}]</code>
+						</small>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-secondary" onclick="closeEditAchievementModal()">
 							Cancelar
 						</button>
 						<button type="submit" class="btn btn-primary">

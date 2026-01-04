@@ -2814,6 +2814,13 @@ function setupAdminTabs() {
 				// Carregar dados específicos da aba se necessário
 				if (targetTab === "roadmaps") {
 					loadRoadmapsForAdmin();
+					// Se houver um roadmap selecionado, carregar suas conquistas
+					if (currentRoadmapId) {
+						const currentRoadmap = roadmaps.find((r) => r.id === currentRoadmapId);
+						if (currentRoadmap) {
+							handleManageRoadmapAchievements(currentRoadmapId, currentRoadmap.name);
+						}
+					}
 				} else if (targetTab === "tools") {
 					// Recarregar estatísticas quando abrir a aba de Ferramentas
 					updateAdminStats();
@@ -4174,6 +4181,9 @@ function renderRoadmapsList(roadmapsData) {
 					</p>
 				</div>
 				<div class="admin-item-actions">
+					<button class="btn btn-success btn-sm" onclick="handleManageRoadmapAchievements(${roadmap.id}, '${roadmap.name.replace(/'/g, "\\'")}')" title="Gerenciar conquistas">
+						<i class="fas fa-trophy"></i> Conquistas
+					</button>
 					${
 						isCurrent
 							? `
@@ -4383,6 +4393,303 @@ window.handleDeleteRoadmap = async function (roadmapId, roadmapName) {
 		hideLoading();
 	}
 };
+
+// ===== FUNÇÕES DE GERENCIAMENTO DE CONQUISTAS POR ROADMAP =====
+
+let currentManagingRoadmapId = null;
+
+window.handleManageRoadmapAchievements = async function (roadmapId, roadmapName) {
+	console.log("🏆 Gerenciando conquistas do roadmap:", roadmapId, roadmapName);
+	currentManagingRoadmapId = roadmapId;
+	
+	// Atualizar título do container
+	const container = document.getElementById("roadmapAchievementsContainer");
+	if (container) {
+		container.innerHTML = `
+			<div style="margin-bottom: 15px;">
+				<h4 style="margin-bottom: 10px;">Conquistas de: ${roadmapName}</h4>
+				<button class="btn btn-primary btn-sm" onclick="handleCreateAchievement(${roadmapId})" style="margin-bottom: 15px;">
+					<i class="fas fa-plus"></i> Criar Nova Conquista
+				</button>
+			</div>
+			<div id="roadmapAchievementsList" class="admin-list">
+				<p>Carregando conquistas...</p>
+			</div>
+		`;
+	}
+	
+	// Carregar conquistas do roadmap
+	await loadRoadmapAchievements(roadmapId);
+};
+
+async function loadRoadmapAchievements(roadmapId) {
+	console.log("🔄 Carregando conquistas do roadmap:", roadmapId);
+	
+	const listContainer = document.getElementById("roadmapAchievementsList");
+	if (!listContainer) {
+		console.error("❌ Container de conquistas não encontrado");
+		return;
+	}
+	
+	try {
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/achievements?roadmapId=${roadmapId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok) {
+			const achievements = await response.json();
+			console.log("✅ Conquistas carregadas:", achievements.length);
+			
+			if (achievements.length === 0) {
+				listContainer.innerHTML = `
+					<p class="empty-message">Nenhuma conquista cadastrada para este roadmap.</p>
+				`;
+			} else {
+				listContainer.innerHTML = achievements
+					.map((achievement) => {
+						return `
+						<div class="admin-item">
+							<div class="admin-item-info">
+								<h4>
+									<span style="font-size: 1.5rem; margin-right: 10px;">${achievement.icon || "🏆"}</span>
+									${achievement.name}
+								</h4>
+								<p class="admin-item-meta">
+									${achievement.description}
+									<br>
+									<small style="color: var(--text-muted);">
+										XP: ${achievement.xpReward || 0} • 
+										Condições: ${achievement.condition}
+									</small>
+								</p>
+							</div>
+							<div class="admin-item-actions">
+								<button class="btn btn-primary btn-sm" onclick="handleEditAchievement(${achievement.id}, ${roadmapId})" title="Editar conquista">
+									<i class="fas fa-edit"></i> Editar
+								</button>
+								<button class="btn btn-danger btn-sm" onclick="handleDeleteAchievement(${achievement.id}, ${roadmapId}, '${achievement.name.replace(/'/g, "\\'")}')" title="Excluir conquista">
+									<i class="fas fa-trash"></i> Excluir
+								</button>
+							</div>
+						</div>
+					`;
+					})
+					.join("");
+			}
+		} else {
+			const errorText = await response.text();
+			console.error("❌ Erro ao carregar conquistas:", response.status, errorText);
+			listContainer.innerHTML = `
+				<p class="empty-message" style="color: var(--error);">
+					Erro ao carregar conquistas: ${errorText}
+				</p>
+			`;
+		}
+	} catch (error) {
+		console.error("❌ Erro ao carregar conquistas:", error);
+		if (listContainer) {
+			listContainer.innerHTML = `
+				<p class="empty-message" style="color: var(--error);">
+					Erro de conexão ao carregar conquistas.
+				</p>
+			`;
+		}
+	}
+}
+
+window.handleCreateAchievement = function (roadmapId) {
+	console.log("➕ Criando nova conquista para roadmap:", roadmapId);
+	
+	// Limpar formulário
+	document.getElementById("editAchievementId").value = "";
+	document.getElementById("editAchievementRoadmapId").value = roadmapId;
+	document.getElementById("editAchievementName").value = "";
+	document.getElementById("editAchievementDescription").value = "";
+	document.getElementById("editAchievementIcon").value = "🏆";
+	document.getElementById("editAchievementXpReward").value = "0";
+	document.getElementById("editAchievementCondition").value = '[{"type": "topics_completed", "value": 1}]';
+	document.getElementById("editAchievementModalTitle").textContent = "Criar Conquista";
+	
+	// Mostrar modal
+	const modal = document.getElementById("editAchievementModal");
+	if (modal) {
+		modal.style.display = "flex";
+	}
+};
+
+window.handleEditAchievement = async function (achievementId, roadmapId) {
+	console.log("✏️ Editando conquista:", achievementId);
+	
+	try {
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/achievements/${achievementId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok) {
+			const achievement = await response.json();
+			
+			// Preencher formulário
+			document.getElementById("editAchievementId").value = achievement.id;
+			document.getElementById("editAchievementRoadmapId").value = roadmapId;
+			document.getElementById("editAchievementName").value = achievement.name;
+			document.getElementById("editAchievementDescription").value = achievement.description;
+			document.getElementById("editAchievementIcon").value = achievement.icon;
+			document.getElementById("editAchievementXpReward").value = achievement.xpReward || 0;
+			document.getElementById("editAchievementCondition").value = achievement.condition;
+			document.getElementById("editAchievementModalTitle").textContent = "Editar Conquista";
+			
+			// Mostrar modal
+			const modal = document.getElementById("editAchievementModal");
+			if (modal) {
+				modal.style.display = "flex";
+			}
+		} else {
+			const errorText = await response.text();
+			console.error("❌ Erro ao carregar conquista:", errorText);
+			showError("Erro ao carregar conquista: " + errorText);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao carregar conquista:", error);
+		showError("Erro de conexão ao carregar conquista");
+	}
+};
+
+window.handleDeleteAchievement = async function (achievementId, roadmapId, achievementName) {
+	if (!confirm(`Tem certeza que deseja excluir a conquista "${achievementName}"?`)) {
+		return;
+	}
+	
+	showLoading();
+	try {
+		const token = localStorage.getItem("token");
+		const response = await fetch(`${API_BASE_URL}/api/v1/achievements/${achievementId}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		
+		if (response.ok || response.status === 204) {
+			showSuccess("Conquista excluída com sucesso!");
+			await loadRoadmapAchievements(roadmapId);
+		} else {
+			const errorText = await response.text();
+			console.error("❌ Erro ao excluir conquista:", errorText);
+			showError("Erro ao excluir conquista: " + errorText);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao excluir conquista:", error);
+		showError("Erro de conexão ao excluir conquista");
+	} finally {
+		hideLoading();
+	}
+};
+
+window.closeEditAchievementModal = function () {
+	const modal = document.getElementById("editAchievementModal");
+	if (modal) {
+		modal.style.display = "none";
+	}
+};
+
+// Event listener para o formulário de conquista
+if (typeof document !== "undefined") {
+	// Aguardar DOM estar pronto
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", setupAchievementForm);
+	} else {
+		setupAchievementForm();
+	}
+}
+
+function setupAchievementForm() {
+	const achievementForm = document.getElementById("editAchievementForm");
+	if (achievementForm) {
+		achievementForm.addEventListener("submit", handleSaveAchievement);
+	}
+	
+	// Fechar modal ao clicar fora
+	const achievementModal = document.getElementById("editAchievementModal");
+	if (achievementModal) {
+		achievementModal.addEventListener("click", function (e) {
+			if (e.target === achievementModal) {
+				closeEditAchievementModal();
+			}
+		});
+	}
+}
+
+async function handleSaveAchievement(e) {
+	e.preventDefault();
+	
+	const formData = {
+		id: document.getElementById("editAchievementId").value,
+		roadmapId: parseInt(document.getElementById("editAchievementRoadmapId").value),
+		name: document.getElementById("editAchievementName").value.trim(),
+		description: document.getElementById("editAchievementDescription").value.trim(),
+		icon: document.getElementById("editAchievementIcon").value.trim(),
+		xpReward: parseInt(document.getElementById("editAchievementXpReward").value) || 0,
+		condition: document.getElementById("editAchievementCondition").value.trim(),
+	};
+	
+	// Validar JSON das condições
+	try {
+		JSON.parse(formData.condition);
+	} catch (error) {
+		showError("Formato JSON inválido nas condições. Verifique a sintaxe.");
+		return;
+	}
+	
+	showLoading();
+	try {
+		const token = localStorage.getItem("token");
+		const isEdit = formData.id && formData.id !== "";
+		
+		const url = isEdit
+			? `${API_BASE_URL}/api/v1/achievements/${formData.id}`
+			: `${API_BASE_URL}/api/v1/achievements`;
+		
+		const method = isEdit ? "PATCH" : "POST";
+		
+		// Remover id do body
+		const { id, ...body } = formData;
+		
+		const response = await fetch(url, {
+			method,
+			headers: {
+				Authorization: `Bearer ${token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(body),
+		});
+		
+		if (response.ok) {
+			const result = await response.json();
+			showSuccess(isEdit ? "Conquista atualizada com sucesso!" : "Conquista criada com sucesso!");
+			closeEditAchievementModal();
+			
+			// Recarregar lista de conquistas
+			if (currentManagingRoadmapId) {
+				await loadRoadmapAchievements(currentManagingRoadmapId);
+			}
+		} else {
+			const errorText = await response.text();
+			console.error("❌ Erro ao salvar conquista:", errorText);
+			showError("Erro ao salvar conquista: " + errorText);
+		}
+	} catch (error) {
+		console.error("❌ Erro ao salvar conquista:", error);
+		showError("Erro de conexão ao salvar conquista");
+	} finally {
+		hideLoading();
+	}
+}
 
 async function loadLevels() {
 	console.log("🔄 Carregando níveis...");

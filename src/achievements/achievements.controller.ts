@@ -36,8 +36,9 @@ export class AchievementsController {
 	@Version("1")
 	@ApiOperation({ summary: "Listar todas as conquistas" })
 	@ApiResponse({ status: 200, description: "Lista de conquistas" })
-	findAll() {
-		return this.achievementsService.findAll();
+	findAll(@Query("roadmapId") roadmapId?: string) {
+		const roadmapIdNum = roadmapId ? parseInt(roadmapId, 10) : undefined;
+		return this.achievementsService.findAll(roadmapIdNum);
 	}
 
 	@Get(":id")
