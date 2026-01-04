@@ -196,7 +196,6 @@ body {
 	padding: 20px 10px;
 	flex: 1 1 auto;
 	min-height: 0;
-	max-height: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -250,17 +249,19 @@ body {
 	flex-grow: 0;
 	background: var(--bg-secondary);
 	position: relative;
-	z-index: 5;
+	z-index: 10;
 	min-height: 120px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
+	margin-top: auto;
 }
 
 .user-info {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+	width: 100%;
 }
 
 .user-info span {
@@ -272,12 +273,16 @@ body {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
+	width: 100%;
 }
 
 .btn-group .btn-sm {
 	flex: 1;
 	min-width: 60px;
 	width: auto;
+	display: inline-flex !important;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 .btn-sm {
@@ -1109,6 +1114,7 @@ body {
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
+		margin-top: auto;
 	}
 
 	.user-info {
@@ -1128,8 +1134,10 @@ body {
 		min-width: 80px;
 		font-size: 0.8rem;
 		padding: 8px 10px;
-		display: inline-flex;
+		display: inline-flex !important;
 		width: auto;
+		visibility: visible !important;
+		opacity: 1 !important;
 	}
 
 	.main-content {
@@ -3566,6 +3574,7 @@ Funcionalidade: ✅ 100% OPERACIONAL
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
+		margin-top: auto;
 	}
 
 	.user-info {
@@ -3590,8 +3599,10 @@ Funcionalidade: ✅ 100% OPERACIONAL
 		min-width: 70px;
 		font-size: 0.75rem;
 		padding: 10px 8px;
-		display: inline-flex;
+		display: inline-flex !important;
 		width: auto;
+		visibility: visible !important;
+		opacity: 1 !important;
 	}
 
 	.challenges-stats {
