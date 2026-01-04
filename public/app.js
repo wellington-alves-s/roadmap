@@ -690,6 +690,13 @@ function setupEventListeners() {
 					await loadLevels();
 					await loadUserProgress(); // Já filtra por roadmap
 					
+					// Recarregar desafios para aplicar filtro de roadmap
+					const challengesSection = document.getElementById("challengesSection");
+					if (challengesSection && challengesSection.style.display !== "none") {
+						console.log("🔄 Recarregando desafios para novo roadmap...");
+						renderChallenges();
+					}
+					
 					// AGORA: Atualizar dashboard e renderizar níveis
 					updateDashboard();
 					renderLevels(); // Forçar renderização
@@ -1573,6 +1580,7 @@ function renderChallenges() {
 			icon: "🏆",
 			color: "#f59e0b",
 			timeLeft: "∞",
+			onlyForRoadmapId: 1, // Apenas para Full Stack Developer
 		},
 		{
 			id: 10,
@@ -1707,7 +1715,7 @@ function renderChallenges() {
 			timeLeft: "∞",
 		},
 
-		// DESAFIOS TÉCNICOS - Específicos por área
+		// DESAFIOS TÉCNICOS - Específicos apenas para Full Stack Developer (roadmapId: 1)
 		{
 			id: 19,
 			title: "💻 Mestre HTML",
@@ -1721,6 +1729,7 @@ function renderChallenges() {
 			icon: "💻",
 			color: "#e67e22",
 			timeLeft: "∞",
+			onlyForRoadmapId: 1, // Apenas para Full Stack Developer
 		},
 		{
 			id: 20,
@@ -1735,6 +1744,7 @@ function renderChallenges() {
 			icon: "🎨",
 			color: "#3498db",
 			timeLeft: "∞",
+			onlyForRoadmapId: 1, // Apenas para Full Stack Developer
 		},
 		{
 			id: 21,
@@ -1749,14 +1759,80 @@ function renderChallenges() {
 			icon: "⚙️",
 			color: "#f39c12",
 			timeLeft: "∞",
+			onlyForRoadmapId: 1, // Apenas para Full Stack Developer
+		},
+
+		// DESAFIOS GENÉRICOS - Aplicam-se a todos os roadmaps (substituem os técnicos em outros roadmaps)
+		{
+			id: 22,
+			title: "📖 Domínio do Conteúdo",
+			description: "Complete 10 tópicos do roadmap atual",
+			type: "generic",
+			difficulty: "medium",
+			xpReward: 300,
+			progress: 0,
+			maxProgress: 10,
+			status: "active",
+			icon: "📖",
+			color: "#9b59b6",
+			timeLeft: "∞",
+			onlyForRoadmapId: null, // Disponível para todos os roadmaps
+		},
+		{
+			id: 23,
+			title: "🎯 Especialista",
+			description: "Complete 20 tópicos do roadmap atual",
+			type: "generic",
+			difficulty: "medium",
+			xpReward: 350,
+			progress: 0,
+			maxProgress: 20,
+			status: "active",
+			icon: "🎯",
+			color: "#1abc9c",
+			timeLeft: "∞",
+			onlyForRoadmapId: null, // Disponível para todos os roadmaps
+		},
+		{
+			id: 24,
+			title: "🏅 Mestre do Roadmap",
+			description: "Complete 30 tópicos do roadmap atual",
+			type: "generic",
+			difficulty: "hard",
+			xpReward: 450,
+			progress: 0,
+			maxProgress: 30,
+			status: "active",
+			icon: "🏅",
+			color: "#e74c3c",
+			timeLeft: "∞",
+			onlyForRoadmapId: null, // Disponível para todos os roadmaps
 		},
 	];
 
 	// Limpar container
 	container.innerHTML = "";
 
+	// Filtrar desafios baseado no roadmap atual
+	// Desafios técnicos (HTML, CSS, JS) só aparecem no Full Stack Developer (ID: 1)
+	// Desafios genéricos aparecem em todos os roadmaps exceto Full Stack
+	const filteredSampleChallenges = sampleChallenges.filter((challenge) => {
+		// Se o desafio tem onlyForRoadmapId definido, verificar se corresponde ao roadmap atual
+		if (challenge.onlyForRoadmapId !== undefined && challenge.onlyForRoadmapId !== null) {
+			return currentRoadmapId === challenge.onlyForRoadmapId;
+		}
+		
+		// Se o desafio é genérico (onlyForRoadmapId: null), mostrar apenas se NÃO for Full Stack
+		if (challenge.type === "generic") {
+			return currentRoadmapId !== 1; // Não mostrar genéricos no Full Stack
+		}
+		
+		// Desafios sem restrição aparecem em todos os roadmaps
+		return true;
+	});
+
 	// Armazenar desafios globalmente para filtros
-	window.allChallenges = sampleChallenges;
+	window.allChallenges = filteredSampleChallenges;
 
 	// Calcular progresso real dos desafios baseado nos dados do usuário
 	calculateRealChallengeProgress();
@@ -1993,6 +2069,18 @@ function calculateRealChallengeProgress() {
 					(p) => p.completed && p.topic?.name?.toLowerCase().includes("javascript"),
 				).length;
 				challenge.progress = Math.min(jsTopics, challenge.maxProgress);
+				break;
+
+			case 22: // Domínio do Conteúdo - Complete 10 tópicos do roadmap atual
+				challenge.progress = Math.min(totalCompletedTopics, challenge.maxProgress);
+				break;
+
+			case 23: // Especialista - Complete 20 tópicos do roadmap atual
+				challenge.progress = Math.min(totalCompletedTopics, challenge.maxProgress);
+				break;
+
+			case 24: // Mestre do Roadmap - Complete 30 tópicos do roadmap atual
+				challenge.progress = Math.min(totalCompletedTopics, challenge.maxProgress);
 				break;
 
 			default:
